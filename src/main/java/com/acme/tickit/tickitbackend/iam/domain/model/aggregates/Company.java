@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.iam.domain.model.aggregates;
 
+import com.acme.tickit.tickitbackend.iam.domain.exceptions.CompanyCodeNotGeneratedException;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateCompanyCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.JiraData;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @Setter
@@ -38,14 +40,21 @@ public class Company extends AuditableAbstractAggregateRoot<Company> {
         this.jiraData = new JiraData(jiraEmail, jiraPassword);
         this.isJiraActive = isJiraActive;
         this.isSlackActive = isSlackActive;
-        this.code = new CompanyCode(code);
+        this.code = new CompanyCode(generateCompanyCode(code));
     }
 
-    public Company(CreateCompanyCommand command, CompanyCode code) {
+    public Company(CreateCompanyCommand command) {
         this.companyName = command.companyName();
         this.jiraData = new JiraData(command.jiraEmail(), command.jiraPassword());
         this.isJiraActive = command.isJiraActive();
         this.isSlackActive = command.isSlackActive();
-        this.code = code;
+        this.code = new CompanyCode(generateCompanyCode(command.companyName()));
+    }
+
+    public String generateCompanyCode(String name) {
+        int number = ThreadLocalRandom.current().nextInt(101, 999);
+        if (name != null && !name.isEmpty()) {
+            return "T" + name.toUpperCase().substring(0, 3) + number;
+        } else throw new CompanyCodeNotGeneratedException();
     }
 }
