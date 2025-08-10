@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.iam.domain.model.aggregates;
 
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateCompanyCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.JiraData;
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -32,11 +33,19 @@ public class Company extends AuditableAbstractAggregateRoot<Company> {
     public Company() {}
 
     public Company(String companyName, String jiraEmail, String jiraPassword,
-                   Boolean isJiraActive,  Boolean isSlackActive, String code) {
+                   Boolean isJiraActive, Boolean isSlackActive, String code) {
         this.companyName = companyName;
         this.jiraData = new JiraData(jiraEmail, jiraPassword);
         this.isJiraActive = isJiraActive;
         this.isSlackActive = isSlackActive;
         this.code = new CompanyCode(code);
+    }
+
+    public Company(CreateCompanyCommand command, CompanyCode code) {
+        this.companyName = command.companyName();
+        this.jiraData = new JiraData(command.jiraEmail(), command.jiraPassword());
+        this.isJiraActive = command.isJiraActive();
+        this.isSlackActive = command.isSlackActive();
+        this.code = code;
     }
 }
