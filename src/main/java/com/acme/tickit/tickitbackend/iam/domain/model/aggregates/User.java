@@ -17,6 +17,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     private PersonalData personalData;
 
     @Embedded
+    @Column(nullable = false)
     private Password password;
 
     private Boolean notify_active;
@@ -26,7 +27,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     private Role role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false)
+    @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = false)
     private Company company;
 
     public User() {}
