@@ -26,4 +26,19 @@ public class Role extends AuditableModel {
     public Role(Roles name) {
         this.name = name;
     }
+
+    public String getStringName() {
+        return name.name();
+    }
+
+    public static Role getDefaultRole() {
+        return new Role(Roles.EMPLOYEE);
+    }
+
+    public static List<Role> validateRoleSet(List<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return List.of(getDefaultRole());
+        }
+        return roles;
+    }
 }

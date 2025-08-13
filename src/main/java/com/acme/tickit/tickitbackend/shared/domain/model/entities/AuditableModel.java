@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 @MappedSuperclass
 public class AuditableModel {
     @Id
