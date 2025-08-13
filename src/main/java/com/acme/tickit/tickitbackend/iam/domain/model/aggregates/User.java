@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.iam.domain.model.aggregates;
 
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Password;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
@@ -38,5 +39,12 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.notify_active = notify_active;
         this.role = role;
         this.company = company;
+    }
+
+    public User(CreateUserCommand command, String encryptPassword) {
+        this.personalData = new PersonalData(command.username(), command.email());
+        this.password = new Password(encryptPassword);
+        this.notify_active = false;
+        // missing role & company, find by id
     }
 }
