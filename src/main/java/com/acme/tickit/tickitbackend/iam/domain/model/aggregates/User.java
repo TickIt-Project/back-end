@@ -41,10 +41,11 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.company = company;
     }
 
-    public User(CreateUserCommand command, String encryptPassword) {
+    public User(CreateUserCommand command, String encryptPassword, Company company, Role role) {
         this.personalData = new PersonalData(command.username(), command.email());
         this.password = new Password(encryptPassword);
         this.notify_active = false;
-        // missing role & company, find by id
+        this.company = company;
+        this.role = role;
     }
 }
