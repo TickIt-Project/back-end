@@ -40,7 +40,7 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
     )
     private List<Keyword> keywords = new ArrayList<>();
 
-    @OneToMany(mappedBy = "issueCoincidence", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "issueCoincidences")
     private List<ScreenLocation> screenLocations = new ArrayList<>();
 
     public IssueCoincidence() {}
