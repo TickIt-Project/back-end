@@ -15,4 +15,5 @@ public interface CompanyRepository extends JpaRepository<Company, UUID> {
     boolean existsByCode(CompanyCode companyCode);
     boolean existsByJiraData(JiraData jiraData);
     Optional<Company> findById(UUID id);
+    Optional<Company> findByCode(CompanyCode companyCode);
 }
