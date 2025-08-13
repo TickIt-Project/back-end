@@ -4,10 +4,7 @@ import com.acme.tickit.tickitbackend.shared.domain.model.entities.AuditableModel
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueCoincidence;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,7 +26,12 @@ public class ScreenLocation extends AuditableModel {
     @OneToMany(mappedBy = "screenLocation", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<IssueReport> issueReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "screenLocation", cascade = CascadeType.ALL, orphanRemoval = false)
+    @ManyToMany
+    @JoinTable(
+            name = "screen_location_issue_coincidence",
+            joinColumns = @JoinColumn(name = "screen_location_id"),
+            inverseJoinColumns = @JoinColumn(name = "issue_coincidence_id")
+    )
     private List<IssueCoincidence> issueCoincidences = new ArrayList<>();
 
     public ScreenLocation() {}

@@ -47,11 +47,11 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     private Status status;
 
     @Embedded
-    @AttributeOverride(name = "userId", column = @Column(name = "reporter_id"))
+    @AttributeOverride(name = "userId", column = @Column(name = "reporter_user_id", nullable = false))
     private UserID reporterID;
 
     @Embedded
-    @AttributeOverride(name = "userId", column = @Column(name = "assignee_id"))
+    @AttributeOverride(name = "userId", column = @Column(name = "assignee_user_id", nullable = true))
     private UserID assigneeID;
 
     private LocalDateTime resolved_at;
