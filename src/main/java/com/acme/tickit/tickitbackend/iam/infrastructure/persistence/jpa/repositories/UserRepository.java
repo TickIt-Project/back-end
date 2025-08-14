@@ -7,6 +7,7 @@ import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,4 +17,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByPersonalData_Name(String personalDataName);
     boolean existsByPersonalData_Email(String personalDataEmail);
     Boolean existsByCompany_CodeAndRole_Name(CompanyCode companyCode, Roles roleName);
+    List<User> findAllByCompany_Id(UUID companyId);
 }

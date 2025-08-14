@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.iam.interfaces.rest.controllers;
 
+import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetCompanyByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
@@ -18,10 +19,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -53,5 +53,18 @@ public class UserController {
         var userEntity = user.get();
         var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(userEntity);
         return new ResponseEntity<>(userResource, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all users", description = "Get all users for the current tenant")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully.")})
+    public ResponseEntity<List<UserResource>> getAllUsers() {
+        var getAllUsersQuery = new GetAllUsersQuery();
+        var users = userQueryService.handle(getAllUsersQuery);
+        var userResources = users.stream()
+                .map(UserResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(userResources);
     }
 }

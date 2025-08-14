@@ -10,7 +10,7 @@ import java.util.UUID;
 public class TenantContext {
 
     private static final ThreadLocal<UUID> CURRENT_TENANT_ID = new ThreadLocal<>();
-    private static final UUID DEFAULT_TENANT_ID = UUID.fromString("3f9e2e90-8c49-4d27-a8d8-9f0a8c6c7d4a");
+    private static final UUID DEFAULT_TENANT_ID = UUID.fromString("63fd9c11-8805-4921-bce3-8e15b13fb69d");
 
     private TenantContext() {
         // Private constructor to prevent instantiation
