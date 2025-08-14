@@ -18,6 +18,7 @@ import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.reposito
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.RoleNotFoundException;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 @Service
@@ -47,7 +48,16 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new RoleNameNotFoundException(command.role());
         var company = companyRepository.findByCode(new CompanyCode(command.companyCode())).get();
         var role = roleRepository.findByName(Roles.valueOf(command.role())).get();
-        var user = new User(command, hashingService.encode(command.password()), company, role);
+        var finalPassword = command.password();
+        if (finalPassword == null) {
+            SecureRandom r = new SecureRandom();
+            finalPassword = r.ints(48, 123)
+                    .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                    .limit(8)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString();
+        }
+        var user = new User(command, hashingService.encode(finalPassword), company, role);
         try {
             userRepository.save(user);
         } catch (Exception e) {
