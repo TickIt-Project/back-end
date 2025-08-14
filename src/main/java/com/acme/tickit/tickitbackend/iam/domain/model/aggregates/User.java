@@ -44,7 +44,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     public User(CreateUserCommand command, String encryptPassword, Company company, Role role) {
         this.personalData = new PersonalData(command.username(), command.email());
         this.password = new Password(encryptPassword);
-        this.notify_active = false;
+        this.notify_active = command.notify_active();
         this.company = company;
         this.role = role;
     }
