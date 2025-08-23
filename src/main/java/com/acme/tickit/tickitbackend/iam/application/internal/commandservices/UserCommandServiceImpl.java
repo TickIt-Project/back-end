@@ -4,6 +4,7 @@ import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.H
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
@@ -12,6 +13,7 @@ import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.CompanyRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
+import com.acme.tickit.tickitbackend.shared.infrastructure.multitenancy.TenantContext;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.RoleNotFoundException;
@@ -67,5 +69,15 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new UserNotCreatedException(e.getMessage());
         }
         return user.getId();
+    }
+
+    @Override
+    public UUID handle(SignInCommand query) {
+        User user = userRepository.findByPersonalData_Name(query.username())
+                .orElseThrow(() -> new UserNotFoundException(query.username()));
+        if (!hashingService.matches(query.password(), user.getPassword().password()))
+            throw new InvalidPasswordException();
+        var company = user.getCompany();
+        return company.getId();
     }
 }
