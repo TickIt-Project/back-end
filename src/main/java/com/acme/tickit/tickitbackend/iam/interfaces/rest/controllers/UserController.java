@@ -1,18 +1,18 @@
 package com.acme.tickit.tickitbackend.iam.interfaces.rest.controllers;
 
+import com.acme.tickit.tickitbackend.iam.domain.exceptions.UserNotFoundException;
+import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetCompanyByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
+import com.acme.tickit.tickitbackend.iam.domain.model.queries.SignInQuery;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserQueryService;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.CompanyResource;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.CreateCompanyResource;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.CreateUserResource;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.UserResource;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.transform.CompanyResourceFromEntityAssembler;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.transform.CreateCompanyCommandFromResourceAssembler;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.transform.CreateUserCommandFromResourceAssembler;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
+import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
+import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.*;
+import com.acme.tickit.tickitbackend.iam.interfaces.rest.transform.*;
+import com.acme.tickit.tickitbackend.shared.infrastructure.security.JwtService;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -21,7 +21,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -31,13 +34,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController {
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
+    private final JwtService jwtService;
 
-    public UserController(UserCommandService userCommandService, UserQueryService userQueryService) {
+    public UserController(UserCommandService userCommandService, UserQueryService userQueryService, JwtService jwtService) {
         this.userCommandService = userCommandService;
         this.userQueryService = userQueryService;
+        this.jwtService = jwtService;
     }
 
-    @PostMapping("/users")
+    @PostMapping("/users/sign-up")
     @Operation(summary = "Create a new User", description = "Create a new User")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User created"),
@@ -55,7 +60,7 @@ public class UserController {
         return new ResponseEntity<>(userResource, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/users")
     @Operation(summary = "Get all users", description = "Get all users for the current tenant")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully.")})
@@ -67,4 +72,28 @@ public class UserController {
                 .toList();
         return ResponseEntity.ok(userResources);
     }
+
+    @PostMapping("/sign-in")
+    public ResponseEntity<AuthenticatedUserResource> signIn(@RequestBody SignInResource body) {
+        var query = new SignInQuery(body.username(), body.password());
+        String token = userQueryService.handle(query);
+
+        String userId    = jwtService.extractClaim(token, Claims::getSubject);
+        String username  = jwtService.extractClaim(token, c -> c.get("username", String.class));
+        String role      = jwtService.extractClaim(token, c -> c.get("role", String.class));
+        String companyId = jwtService.extractClaim(token, c -> c.get("companyId", String.class));
+
+        var resource = new AuthenticatedUserResource(
+                token,
+                java.util.UUID.fromString(userId),
+                username,
+                role,
+                companyId
+        );
+        return ResponseEntity.ok(resource);
+    }
 }
+
+/**
+ * usar plan B WAAAAAAAAAA
+ */

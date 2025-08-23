@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -30,10 +31,27 @@ public class JwtService {
 
     public Map<String, Object> parseClaims(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)   // 👈 reemplaza setSigningKey
+                .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(token) // 👈 reemplaza parseClaimsJws
+                .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)        // ✅ API nueva
+                .build()
+                .parseSignedClaims(token)     // ✅ API nueva
+                .getPayload();
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String extractCompanyId(String token) {
+        return extractClaim(token, claims -> claims.get("companyId", String.class));
     }
 
 }
