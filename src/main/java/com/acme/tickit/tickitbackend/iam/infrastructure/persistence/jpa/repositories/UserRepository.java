@@ -19,4 +19,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Boolean existsByCompany_CodeAndRole_Name(CompanyCode companyCode, Roles roleName);
     List<User> findAllByCompany_Id(UUID companyId);
     Optional<User> findByPersonalData_Name(String username);
+    List<User> findAllByCompany_IdAndRole_Name(UUID companyId, Roles roleName);
 }
