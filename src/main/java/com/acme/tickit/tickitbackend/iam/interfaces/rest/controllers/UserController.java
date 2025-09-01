@@ -3,6 +3,7 @@ package com.acme.tickit.tickitbackend.iam.interfaces.rest.controllers;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
+import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersByRoleQuery;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserQueryService;
 import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.*;
@@ -74,5 +75,22 @@ public class UserController {
         var companyId = userCommandService.handle(signInCommand);
         if (companyId == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(new AuthenticatedUserResource(companyId));
+    }
+
+    @GetMapping("/{companyId}/roles")
+    @Operation(summary = "Get users by role", description = "Get all users by tenant and role")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters."),
+            @ApiResponse(responseCode = "404", description = "Company or role not found."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
+    public ResponseEntity<List<UserResource>> getUsersByRole(@PathVariable UUID companyId, @RequestParam String role) {
+        var getUsersByRoleQuery = new GetUsersByRoleQuery(companyId, role);
+        var users = userQueryService.handle(getUsersByRoleQuery);
+        var userResources = users.stream()
+                .map(UserResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(userResources);
     }
 }
