@@ -5,6 +5,7 @@ import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.UpdateUserPasswordCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.management.relation.RoleNotFoundException;
 import java.security.SecureRandom;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -79,5 +81,20 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new InvalidPasswordException();
         var company = user.getCompany();
         return company.getId();
+    }
+
+    @Override
+    public Optional<User> handle(UpdateUserPasswordCommand command) {
+        User user = userRepository.findByCompany_IdAndPersonalData_Name(command.tenantId(), command.username())
+                .orElseThrow(() -> new UserNotFoundException(command.username()));
+        if (!hashingService.matches(command.oldPassword(), user.getPassword().password()))
+            throw new InvalidPasswordException();
+        try {
+            user.updatePassword(hashingService.encode(command.newPassword()));
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new UserNotSavedException(e.getMessage());
+        }
+        return Optional.of(user);
     }
 }

@@ -48,4 +48,8 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.company = company;
         this.role = role;
     }
+
+    public void updatePassword(String newPassword) {
+        this.password = new Password(newPassword);
+    }
 }
