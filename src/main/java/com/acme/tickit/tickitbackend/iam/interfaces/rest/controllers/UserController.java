@@ -93,4 +93,19 @@ public class UserController {
                 .toList();
         return ResponseEntity.ok(userResources);
     }
+
+    @PatchMapping("/{companyId}/status")
+    @Operation(summary = "Update user password", description = "Updates the password of a user based on its username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User password updated"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserResource> updateUserPassword(@PathVariable UUID companyId, @RequestBody UpdateUserPasswordResource resource) {
+        var command = UpdateUserPasswordCommandFromResourceAssembler.toCommandFromResource(companyId, resource);
+        var updateUser = userCommandService.handle(command);
+        if (updateUser.isEmpty()) return ResponseEntity.badRequest().build();
+        var userEntity = updateUser.get();
+        var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(userEntity);
+        return ResponseEntity.ok(userResource);
+    }
 }
