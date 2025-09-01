@@ -80,7 +80,11 @@ public class UserController {
     @GetMapping("/{companyId}/roles")
     @Operation(summary = "Get users by role", description = "Get all users by tenant and role")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Users retrieved successfully.")})
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters."),
+            @ApiResponse(responseCode = "404", description = "Company or role not found."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public ResponseEntity<List<UserResource>> getUsersByRole(@PathVariable UUID companyId, @RequestParam String role) {
         var getUsersByRoleQuery = new GetUsersByRoleQuery(companyId, role);
         var users = userQueryService.handle(getUsersByRoleQuery);
