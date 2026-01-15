@@ -7,6 +7,7 @@ import com.acme.tickit.tickitbackend.iam.interfaces.rest.transform.RoleResourceF
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/roles", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Roles", description = "Available Role Endpoints")
+@SecurityRequirement(name = "bearerAuth")
 public class RoleController {
     private final RoleQueryService roleQueryService;
 

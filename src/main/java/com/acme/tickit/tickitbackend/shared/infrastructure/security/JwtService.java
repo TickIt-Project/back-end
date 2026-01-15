@@ -2,11 +2,12 @@ package com.acme.tickit.tickitbackend.shared.infrastructure.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,7 +15,14 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${authorization.jwt.secret}")
+    private String secret;
+
+    private SecretKey getSecretKey() {
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     private final long expiration = 1000 * 60 * 60; // 1 hora
 
     public String generateToken(String userId, String username, String role, String companyId) {
@@ -25,13 +33,13 @@ public class JwtService {
                 .claim("companyId", companyId) // tenantId
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(secretKey)
+                .signWith(getSecretKey())
                 .compact();
     }
 
     public Map<String, Object> parseClaims(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -39,9 +47,9 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(secretKey)        // ✅ API nueva
+                .verifyWith(getSecretKey())
                 .build()
-                .parseSignedClaims(token)     // ✅ API nueva
+                .parseSignedClaims(token)
                 .getPayload();
     }
 

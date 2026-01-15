@@ -1,6 +1,7 @@
 package com.acme.tickit.tickitbackend.iam.application.internal.commandservices;
 
 import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.HashingService;
+import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.TokenService;
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
@@ -15,6 +16,7 @@ import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.reposito
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import com.acme.tickit.tickitbackend.shared.infrastructure.multitenancy.TenantContext;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.RoleNotFoundException;
@@ -29,15 +31,17 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final CompanyRepository companyRepository;
     private final RoleRepository roleRepository;
     private final HashingService hashingService;
+    private final TokenService tokenService;
 
     public UserCommandServiceImpl(UserRepository userRepository,
                                   HashingService hashingService,
                                   CompanyRepository companyRepository,
-                                  RoleRepository roleRepository) {
+                                  RoleRepository roleRepository, TokenService tokenService) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.companyRepository = companyRepository;
         this.roleRepository = roleRepository;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -74,13 +78,13 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public UUID handle(SignInCommand query) {
+    public Optional<ImmutablePair<User, String>> handle(SignInCommand query) {
         User user = userRepository.findByPersonalData_Name(query.username())
                 .orElseThrow(() -> new UserNotFoundException(query.username()));
         if (!hashingService.matches(query.password(), user.getPassword().password()))
             throw new InvalidPasswordException();
-        var company = user.getCompany();
-        return company.getId();
+        var token = tokenService.generateToken(user.getPersonalData().email());
+        return Optional.of(ImmutablePair.of(user, token));
     }
 
     @Override
