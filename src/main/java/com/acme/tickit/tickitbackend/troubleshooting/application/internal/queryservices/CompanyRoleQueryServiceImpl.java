@@ -6,10 +6,12 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetAll
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetCompanyRoleByIdQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.CompanyRoleQueryService;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.CompanyRoleRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class CompanyRoleQueryServiceImpl implements CompanyRoleQueryService {
     private final CompanyRoleRepository companyRoleRepository;
 

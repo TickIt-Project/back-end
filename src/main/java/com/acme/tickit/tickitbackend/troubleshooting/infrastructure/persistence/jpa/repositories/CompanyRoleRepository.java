@@ -13,5 +13,5 @@ import java.util.UUID;
 public interface CompanyRoleRepository extends JpaRepository<CompanyRole, UUID> {
     Optional<CompanyRole> findById(UUID id);
     List<CompanyRole> findAllByCompanyId(CompanyID companyId);
-    boolean findByNameAndCompanyId(String name, CompanyID companyId);
+    boolean existsByNameAndCompanyId(String name, CompanyID companyId);
 }

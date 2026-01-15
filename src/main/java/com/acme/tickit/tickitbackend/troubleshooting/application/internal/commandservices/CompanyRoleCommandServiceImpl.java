@@ -7,9 +7,11 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.Creat
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.CompanyRoleCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.CompanyRoleRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class CompanyRoleCommandServiceImpl implements CompanyRoleCommandService {
     private final CompanyRoleRepository companyRoleRepository;
 
@@ -19,7 +21,7 @@ public class CompanyRoleCommandServiceImpl implements CompanyRoleCommandService 
 
     @Override
     public UUID handle(CreateCompanyRoleCommand command) {
-        if (companyRoleRepository.findByNameAndCompanyId(command.name(), new CompanyID(command.CompanyId())))
+        if (companyRoleRepository.existsByNameAndCompanyId(command.name(), new CompanyID(command.CompanyId())))
             throw new CompanyRoleAlreadyExistsException(command.name());
         var role = new CompanyRole(command);
         try {
