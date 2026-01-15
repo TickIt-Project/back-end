@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.iam.interfaces.rest.controllers;
 
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersByRoleQuery;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
@@ -73,6 +74,20 @@ public class UserController {
         var updateUser = userCommandService.handle(command);
         if (updateUser.isEmpty()) return ResponseEntity.badRequest().build();
         var userEntity = updateUser.get();
+        var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(userEntity);
+        return ResponseEntity.ok(userResource);
+    }
+
+    @DeleteMapping("/{userId}")
+    @Operation(summary = "Delete User", description = "Delete User")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User deleted successfully."),
+            @ApiResponse(responseCode = "404", description = "User not found.")})
+    public ResponseEntity<UserResource> deleteUser(@PathVariable UUID userId) {
+        DeleteUserByIdCommand command = new DeleteUserByIdCommand(userId);
+        var user = userCommandService.handle(command);
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+        var userEntity = user.get();
         var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(userEntity);
         return ResponseEntity.ok(userResource);
     }
