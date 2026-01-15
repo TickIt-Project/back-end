@@ -5,6 +5,7 @@ import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.T
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.UpdateUserPasswordCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
@@ -99,6 +100,14 @@ public class UserCommandServiceImpl implements UserCommandService {
         } catch (Exception e) {
             throw new UserNotSavedException(e.getMessage());
         }
+        return Optional.of(user);
+    }
+
+    @Override
+    public Optional<User> handle(DeleteUserByIdCommand command) {
+        User user = userRepository.findById(command.id())
+                .orElseThrow(() -> new UserNotFoundException(command.id().toString()));
+        userRepository.delete(user);
         return Optional.of(user);
     }
 }
