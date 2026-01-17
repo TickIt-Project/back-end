@@ -4,6 +4,7 @@ import com.acme.tickit.tickitbackend.shared.domain.model.entities.AuditableModel
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueCoincidence;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateScreenLocationCommand;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,7 @@ public class ScreenLocation extends AuditableModel {
     private String url;
 
     @Embedded
-    private CompanyID companyID;
+    private CompanyID companyId;
 
     @OneToMany(mappedBy = "screenLocation", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<IssueReport> issueReports = new ArrayList<>();
@@ -39,7 +40,13 @@ public class ScreenLocation extends AuditableModel {
     public ScreenLocation(String name, String url, UUID companyID) {
         this.name = name;
         this.url = url;
-        this.companyID = new CompanyID(companyID);
+        this.companyId = new CompanyID(companyID);
+    }
+
+    public ScreenLocation(CreateScreenLocationCommand command) {
+        this.name = command.name();
+        this.url = command.url();
+        this.companyId = new CompanyID(command.companyId());
     }
 
     public void addIssueReport(IssueReport report) {
