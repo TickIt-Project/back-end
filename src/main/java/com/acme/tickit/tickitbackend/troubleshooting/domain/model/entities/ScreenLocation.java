@@ -21,7 +21,7 @@ public class ScreenLocation extends AuditableModel {
     private String url;
 
     @Embedded
-    private CompanyID companyID;
+    private CompanyID companyId;
 
     @OneToMany(mappedBy = "screenLocation", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<IssueReport> issueReports = new ArrayList<>();
@@ -39,7 +39,7 @@ public class ScreenLocation extends AuditableModel {
     public ScreenLocation(String name, String url, UUID companyID) {
         this.name = name;
         this.url = url;
-        this.companyID = new CompanyID(companyID);
+        this.companyId = new CompanyID(companyID);
     }
 
     public void addIssueReport(IssueReport report) {
