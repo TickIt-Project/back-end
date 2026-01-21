@@ -115,6 +115,8 @@ public class WebSecurityConfiguration {
                         ).permitAll()
                         .requestMatchers("/api/v1/roles/**").authenticated()
                         .requestMatchers("/api/v1/users/**").authenticated()
+                        .requestMatchers("/api/v1/company-roles/**").authenticated()
+                        .requestMatchers("api/v1/screen-locations/**").authenticated()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);

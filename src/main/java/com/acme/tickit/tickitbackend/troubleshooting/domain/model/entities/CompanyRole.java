@@ -3,6 +3,7 @@ package com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities;
 import com.acme.tickit.tickitbackend.shared.domain.model.entities.AuditableModel;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateCompanyRoleCommand;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -22,16 +23,21 @@ public class CompanyRole extends AuditableModel {
     private String name;
 
     @Embedded
-    private CompanyID companyID;
+    private CompanyID companyId;
 
     @OneToMany(mappedBy = "companyRole", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<IssueReport> issueReports = new ArrayList<>();
 
     public CompanyRole() {}
 
+    public CompanyRole(CreateCompanyRoleCommand command) {
+        this.name = command.name();
+        this.companyId = new CompanyID(command.CompanyId());
+    }
+
     public CompanyRole(String name, UUID companyID) {
         this.name = name;
-        this.companyID = new CompanyID(companyID);
+        this.companyId = new CompanyID(companyID);
     }
 
     public void addIssueReport(IssueReport report) {
