@@ -1,7 +1,7 @@
-package com.acme.tickit.tickitbackend.troubleshooting.rest.transform;
+package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform;
 
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateScreenLocationCommand;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.CreateScreenLocationResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateScreenLocationResource;
 
 public class CreateScreenLocationCommandFromResourceAssembler {
     public static CreateScreenLocationCommand toCommandFromResource(CreateScreenLocationResource resource) {

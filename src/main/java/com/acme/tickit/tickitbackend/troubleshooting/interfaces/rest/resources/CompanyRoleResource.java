@@ -1,4 +1,4 @@
-package com.acme.tickit.tickitbackend.troubleshooting.rest.resources;
+package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources;
 
 import java.util.UUID;
 

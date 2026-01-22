@@ -1,13 +1,13 @@
-package com.acme.tickit.tickitbackend.troubleshooting.rest.controllers;
+package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.controllers;
 
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetAllScreenLocationsQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetScreenLocationByIdQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.ScreenLocationCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.ScreenLocationQueryService;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.CreateScreenLocationResource;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.ScreenLocationResource;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.transform.CreateScreenLocationCommandFromResourceAssembler;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.transform.ScreenLocationResourceFromEntityAssembler;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateScreenLocationResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.ScreenLocationResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CreateScreenLocationCommandFromResourceAssembler;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.ScreenLocationResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
