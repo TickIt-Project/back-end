@@ -1,13 +1,13 @@
-package com.acme.tickit.tickitbackend.troubleshooting.rest.controllers;
+package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.controllers;
 
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetAllCompanyRolesQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetCompanyRoleByIdQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.CompanyRoleCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.CompanyRoleQueryService;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.CompanyRoleResource;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.CreateCompanyRoleResource;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.transform.CompanyRoleResourceFromEntityAssembler;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.transform.CreateCompanyRoleCommandFromResourceAssembler;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CompanyRoleResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateCompanyRoleResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CompanyRoleResourceFromEntityAssembler;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CreateCompanyRoleCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

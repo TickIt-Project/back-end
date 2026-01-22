@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities;
 
+import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.shared.domain.model.entities.AuditableModel;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
@@ -27,6 +28,9 @@ public class CompanyRole extends AuditableModel {
 
     @OneToMany(mappedBy = "companyRole", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<IssueReport> issueReports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "companyRole", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<User> users = new ArrayList<>();
 
     public CompanyRole() {}
 

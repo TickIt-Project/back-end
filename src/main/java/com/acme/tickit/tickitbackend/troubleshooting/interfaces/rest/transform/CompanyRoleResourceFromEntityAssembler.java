@@ -1,7 +1,7 @@
-package com.acme.tickit.tickitbackend.troubleshooting.rest.transform;
+package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform;
 
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.CompanyRoleResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CompanyRoleResource;
 
 public class CompanyRoleResourceFromEntityAssembler {
     public static CompanyRoleResource toResourceFromEntity(CompanyRole entity) {
