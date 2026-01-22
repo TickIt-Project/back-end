@@ -2,6 +2,7 @@ package com.acme.tickit.tickitbackend.iam.application.internal.commandservices;
 
 import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.HashingService;
 import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.TokenService;
+import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.acl.ExternalCompanyRoleService;
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
@@ -33,16 +34,20 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final RoleRepository roleRepository;
     private final HashingService hashingService;
     private final TokenService tokenService;
+    private final ExternalCompanyRoleService externalCompanyRoleService;
 
     public UserCommandServiceImpl(UserRepository userRepository,
                                   HashingService hashingService,
                                   CompanyRepository companyRepository,
-                                  RoleRepository roleRepository, TokenService tokenService) {
+                                  RoleRepository roleRepository,
+                                  TokenService tokenService,
+                                  ExternalCompanyRoleService externalCompanyRoleService) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.companyRepository = companyRepository;
         this.roleRepository = roleRepository;
         this.tokenService = tokenService;
+        this.externalCompanyRoleService = externalCompanyRoleService;
     }
 
     @Override
@@ -69,7 +74,8 @@ public class UserCommandServiceImpl implements UserCommandService {
                     .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                     .toString();
         }
-        var user = new User(command, hashingService.encode(finalPassword), company, role);
+        var companyRole = externalCompanyRoleService.GetCompanyRoleById(command.companyRoleId()).orElse(null);
+        var user = new User(command, hashingService.encode(finalPassword), company, role, companyRole);
         try {
             userRepository.save(user);
         } catch (Exception e) {
