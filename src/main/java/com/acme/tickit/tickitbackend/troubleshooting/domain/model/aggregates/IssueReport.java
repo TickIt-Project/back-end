@@ -25,7 +25,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     @Column(name = "title", length = 100)
     private String title;
 
-    @Column(name = "description", length = 3500)
+    @Column(name = "description")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,27 +48,26 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     @Embedded
     @AttributeOverride(name = "userId", column = @Column(name = "reporter_user_id", nullable = false))
-    private UserID reporterID;
+    private UserID reporterId;
 
     @Embedded
-    @AttributeOverride(name = "userId", column = @Column(name = "assignee_user_id", nullable = true))
-    private UserID assigneeID;
+    @AttributeOverride(name = "userId", column = @Column(name = "assignee_user_id"))
+    private UserID assigneeId;
 
-    private LocalDateTime resolved_at;
-    private Boolean ticket_option;
+    private LocalDateTime resolvedAt;
+    private Boolean ticketOption;
+    private String issueScreenUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_coincidence_id", nullable = true)
+    @JoinColumn(name = "issue_coincidence_id")
     private IssueCoincidence issueCoincidence;
-
 
     public IssueReport() {}
 
     public IssueReport(UUID companyID, String title, String description,
                        ScreenLocation screenLocation, CompanyRole companyRole,
-                       Integer severity, String imgUrl, Integer status,
-                       UUID reporterID, UUID assigneeID, LocalDateTime resolved_at,
-                       Boolean ticket_option, IssueCoincidence issueCoincidence) {
+                       Integer severity, String imgUrl, UUID reporterId,
+                       LocalDateTime resolvedAt) {
         this.companyID = new CompanyID(companyID);
         this.title = title;
         this.description = description;
@@ -76,11 +75,11 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.companyRole = companyRole;
         this.severity = Severity.values()[severity];
         this.imgUrl = imgUrl;
-        this.status = Status.values()[status];
-        this.reporterID = new UserID(reporterID);
-        this.assigneeID = new UserID(assigneeID);
-        this.resolved_at = resolved_at;
-        this.ticket_option = ticket_option;
-        this.issueCoincidence = issueCoincidence;
+        this.status = Status.OPEN;
+        this.reporterId = new UserID(reporterId);
+        this.assigneeId = null;
+        this.resolvedAt = resolvedAt;
+        this.ticketOption = false;
+        this.issueCoincidence = null;
     }
 }
