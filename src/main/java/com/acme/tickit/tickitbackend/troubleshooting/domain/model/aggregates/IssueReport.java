@@ -20,7 +20,7 @@ import java.util.UUID;
 public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     @Embedded
-    private CompanyID companyID;
+    private CompanyID companyId;
 
     @Column(name = "title", length = 100)
     private String title;
@@ -64,11 +64,11 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     public IssueReport() {}
 
-    public IssueReport(UUID companyID, String title, String description,
+    public IssueReport(UUID companyId, String title, String description,
                        ScreenLocation screenLocation, CompanyRole companyRole,
                        Integer severity, String imgUrl, UUID reporterId,
                        LocalDateTime resolvedAt) {
-        this.companyID = new CompanyID(companyID);
+        this.companyId = new CompanyID(companyId);
         this.title = title;
         this.description = description;
         this.screenLocation = screenLocation;
