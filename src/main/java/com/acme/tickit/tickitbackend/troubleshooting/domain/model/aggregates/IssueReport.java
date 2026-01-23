@@ -2,6 +2,7 @@ package com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates;
 
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateIssueReportCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.ScreenLocation;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Severity;
@@ -66,19 +67,35 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     public IssueReport(UUID companyId, String title, String description,
                        ScreenLocation screenLocation, CompanyRole companyRole,
-                       Integer severity, String imgUrl, UUID reporterId,
-                       LocalDateTime resolvedAt) {
+                       String severity, String imgUrl, UUID reporterId) {
         this.companyId = new CompanyID(companyId);
         this.title = title;
         this.description = description;
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
-        this.severity = Severity.values()[severity];
+        this.severity = Severity.valueOf(severity);
         this.imgUrl = imgUrl;
         this.status = Status.OPEN;
         this.reporterId = new UserID(reporterId);
         this.assigneeId = null;
-        this.resolvedAt = resolvedAt;
+        this.resolvedAt = null;
+        this.ticketOption = false;
+        this.issueCoincidence = null;
+    }
+
+    public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
+                       CompanyRole companyRole) {
+        this.companyId = new CompanyID(command.companyId());
+        this.title = command.title();
+        this.description = command.description();
+        this.screenLocation = screenLocation;
+        this.companyRole = companyRole;
+        this.severity = Severity.valueOf(command.severity());
+        this.imgUrl = command.imgUrl();
+        this.status = Status.OPEN;
+        this.reporterId = new UserID(command.reporterId());
+        this.assigneeId = null;
+        this.resolvedAt = null;
         this.ticketOption = false;
         this.issueCoincidence = null;
     }

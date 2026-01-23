@@ -15,4 +15,5 @@ public interface ScreenLocationRepository extends JpaRepository<ScreenLocation, 
     List<ScreenLocation> findAllByCompanyId(CompanyID companyId);
     boolean existsByNameAndCompanyId(String name, CompanyID companyId);
     boolean existsByUrlAndCompanyId(String url, CompanyID companyId);
+    boolean existsById(UUID id);
 }
