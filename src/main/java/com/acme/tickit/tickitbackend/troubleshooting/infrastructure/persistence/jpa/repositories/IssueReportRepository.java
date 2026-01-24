@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface IssueReportRepository extends JpaRepository<IssueReport, UUID> {
     Optional<IssueReport> findById(UUID id);
     List<IssueReport> findAllByCompanyId(UUID companyId);
+    boolean existsById(UUID id);
 }
