@@ -9,19 +9,15 @@ import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.UpdateUserPasswordCommand;
-import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
-import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.CompanyRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
-import com.acme.tickit.tickitbackend.shared.infrastructure.multitenancy.TenantContext;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
 import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,6 +59,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (Objects.equals(command.role(), "IT_HEAD") &&
             userRepository.existsByCompany_CodeAndRole_Name(new CompanyCode(command.companyCode()), Roles.valueOf(command.role())))
             throw new ItHeadRepeatedException();
+        if (command.companyRoleId() != null && !externalCompanyRoleService.ExistsCompanyRoleById(command.companyRoleId()))
+            throw new CompanyRoleNotFoundException(command.companyRoleId().toString());
         var company = companyRepository.findByCode(new CompanyCode(command.companyCode())).get();
         var role = roleRepository.findByName(Roles.valueOf(command.role())).get();
         var finalPassword = command.password();
@@ -74,8 +72,7 @@ public class UserCommandServiceImpl implements UserCommandService {
                     .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                     .toString();
         }
-        var companyRole = externalCompanyRoleService.GetCompanyRoleById(command.companyRoleId()).orElse(null);
-        var user = new User(command, hashingService.encode(finalPassword), company, role, companyRole);
+        var user = new User(command, hashingService.encode(finalPassword), company, role);
         try {
             userRepository.save(user);
         } catch (Exception e) {

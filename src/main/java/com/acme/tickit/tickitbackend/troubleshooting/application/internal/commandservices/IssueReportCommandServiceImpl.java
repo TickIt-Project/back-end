@@ -38,10 +38,12 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
             throw new CompanyIdNotFoundException(command.companyId().toString());
         if (!externalUserService.ExistsUserById(command.reporterId()))
             throw new ReporterUserNotFoundException(command.reporterId().toString());
-        if (!screenLocationRepository.existsById(command.screenLocationId()))
+        if (command.screenLocationId() != null && !screenLocationRepository.existsById(command.screenLocationId()))
             throw new ScreenLocationNotFoundException(command.screenLocationId().toString());
-        var companyRole = externalUserService.GetCompanyRoleByUserId(command.companyId());
-        var screenLocation = screenLocationRepository.findById(command.screenLocationId()).orElse(null);
+        var companyRole = externalUserService.GetCompanyRoleByUserId(command.reporterId()).orElse(null);
+        var screenLocation = command.screenLocationId() != null
+                ? screenLocationRepository.findById(command.screenLocationId()).orElse(null)
+                : null;
         var issueReport = new IssueReport(command, screenLocation, companyRole);
         try {
             issueReportRepository.save(issueReport);

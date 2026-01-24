@@ -30,11 +30,11 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "screen_id", nullable = false)
+    @JoinColumn(name = "screen_id")
     private ScreenLocation screenLocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_role_id", nullable = false)
+    @JoinColumn(name = "company_role_id")
     private CompanyRole companyRole;
 
     @Enumerated(EnumType.STRING)
@@ -67,7 +67,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     public IssueReport(UUID companyId, String title, String description,
                        ScreenLocation screenLocation, CompanyRole companyRole,
-                       String severity, String imgUrl, UUID reporterId) {
+                       String severity, String imgUrl, UUID reporterId, String issueScreenUrl) {
         this.companyId = new CompanyID(companyId);
         this.title = title;
         this.description = description;
@@ -81,6 +81,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.resolvedAt = null;
         this.ticketOption = false;
         this.issueCoincidence = null;
+        this.issueScreenUrl = issueScreenUrl;
     }
 
     public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
@@ -98,5 +99,6 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.resolvedAt = null;
         this.ticketOption = false;
         this.issueCoincidence = null;
+        this.issueScreenUrl = command.issueScreenUrl();
     }
 }

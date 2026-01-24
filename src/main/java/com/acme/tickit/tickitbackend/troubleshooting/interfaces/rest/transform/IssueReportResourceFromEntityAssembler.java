@@ -10,17 +10,23 @@ public class IssueReportResourceFromEntityAssembler {
                 entity.getCompanyId().companyId(),
                 entity.getTitle(),
                 entity.getDescription(),
-                entity.getScreenLocation().getName(),
-                entity.getCompanyRole().getName(),
+                entity.getScreenLocation() != null
+                        ? entity.getScreenLocation().getName()
+                        : null,
+                entity.getCompanyRole() != null
+                        ? entity.getCompanyRole().getName()
+                        : null,
                 entity.getSeverity().name(),
-                entity.getImgUrl(),
+                entity.getImgUrl() != null ? entity.getImgUrl() : "",
                 entity.getStatus().name(),
                 entity.getReporterId().userId(),
-                entity.getAssigneeId().userId(),
+                entity.getAssigneeId() != null
+                        ? entity.getAssigneeId().userId()
+                        : null,
                 entity.getCreatedAt(),
                 entity.getResolvedAt(),
                 entity.getTicketOption(),
-                entity.getIssueScreenUrl()
+                entity.getIssueScreenUrl() != null ? entity.getIssueScreenUrl() : ""
         );
     }
 }
