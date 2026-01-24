@@ -4,12 +4,10 @@ import com.acme.tickit.tickitbackend.iam.domain.exceptions.IssueReportNotSavedEx
 import com.acme.tickit.tickitbackend.shared.domain.exceptions.CompanyIdNotFoundException;
 import com.acme.tickit.tickitbackend.troubleshooting.application.internal.outboundservices.acl.ExternalCompanyService;
 import com.acme.tickit.tickitbackend.troubleshooting.application.internal.outboundservices.acl.ExternalUserService;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.IssueReportNotCreatedException;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.IssueReportNotFoundException;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.ReporterUserNotFoundException;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.ScreenLocationNotFoundException;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateIssueReportCommand;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportAssigneeCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportStatusCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.IssueReportRepository;
@@ -63,6 +61,21 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
                 .orElseThrow(() -> new IssueReportNotFoundException(command.issueReportId().toString()));
         try {
             issueReport.updateStatus(command.status());
+            issueReportRepository.save(issueReport);
+        } catch (Exception e) {
+            throw new IssueReportNotSavedException(e.getMessage());
+        }
+        return Optional.of(issueReport);
+    }
+
+    @Override
+    public Optional<IssueReport> handle(UpdateIssueReportAssigneeCommand command) {
+        IssueReport issueReport = issueReportRepository.findById(command.issueReportId())
+                .orElseThrow(() -> new IssueReportNotFoundException(command.issueReportId().toString()));
+        if (!externalUserService.ExistsUserById(command.assigneeId()))
+            throw new AssigneeUserNotFoundException(command.assigneeId().toString());
+        try {
+            issueReport.updateAssigneeId(command.assigneeId());
             issueReportRepository.save(issueReport);
         } catch (Exception e) {
             throw new IssueReportNotSavedException(e.getMessage());

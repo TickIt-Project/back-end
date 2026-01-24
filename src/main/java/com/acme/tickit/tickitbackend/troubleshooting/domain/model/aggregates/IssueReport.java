@@ -111,4 +111,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
             this.status = Status.valueOf(newStatus);
         }
     }
+
+    public void updateAssigneeId(UUID assigneeId) {
+        this.assigneeId = new UserID(assigneeId);
+    }
 }
