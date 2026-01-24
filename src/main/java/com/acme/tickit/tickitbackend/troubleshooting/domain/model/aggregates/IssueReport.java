@@ -101,4 +101,14 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.issueCoincidence = null;
         this.issueScreenUrl = command.issueScreenUrl();
     }
+
+    public void updateStatus(String newStatus) {
+        if (newStatus.toUpperCase().equals(Status.OPEN.name()) ||
+            newStatus.toUpperCase().equals(Status.IN_PROGRESS.name()) ||
+            newStatus.toUpperCase().equals(Status.ON_HOLD.name()) ||
+            newStatus.toUpperCase().equals(Status.CLOSED.name()) ||
+            newStatus.toUpperCase().equals(Status.CANCELLED.name())) {
+            this.status = Status.valueOf(newStatus);
+        }
+    }
 }
