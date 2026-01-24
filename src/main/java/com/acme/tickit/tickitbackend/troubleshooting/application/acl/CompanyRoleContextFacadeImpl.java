@@ -18,8 +18,9 @@ public class CompanyRoleContextFacadeImpl implements CompanyRoleContextFacade {
     }
 
     @Override
-    public Optional<CompanyRole> GetCompanyRoleById(UUID companyRoleId) {
+    public Boolean ExistsCompanyRoleById(UUID companyRoleId) {
         var getCompanyRole = new GetCompanyRoleByIdQuery(companyRoleId);
-        return companyRoleQueryService.handle(getCompanyRole);
+        var companyRole = companyRoleQueryService.handle(getCompanyRole);
+        return companyRole.isPresent();
     }
 }

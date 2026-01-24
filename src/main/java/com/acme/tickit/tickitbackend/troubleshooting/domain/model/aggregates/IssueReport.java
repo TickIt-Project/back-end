@@ -2,6 +2,7 @@ package com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates;
 
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateIssueReportCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.ScreenLocation;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Severity;
@@ -20,20 +21,20 @@ import java.util.UUID;
 public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     @Embedded
-    private CompanyID companyID;
+    private CompanyID companyId;
 
     @Column(name = "title", length = 100)
     private String title;
 
-    @Column(name = "description", length = 3500)
+    @Column(name = "description")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "screen_id", nullable = false)
+    @JoinColumn(name = "screen_id")
     private ScreenLocation screenLocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_role_id", nullable = false)
+    @JoinColumn(name = "company_role_id")
     private CompanyRole companyRole;
 
     @Enumerated(EnumType.STRING)
@@ -48,39 +49,56 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     @Embedded
     @AttributeOverride(name = "userId", column = @Column(name = "reporter_user_id", nullable = false))
-    private UserID reporterID;
+    private UserID reporterId;
 
     @Embedded
-    @AttributeOverride(name = "userId", column = @Column(name = "assignee_user_id", nullable = true))
-    private UserID assigneeID;
+    @AttributeOverride(name = "userId", column = @Column(name = "assignee_user_id"))
+    private UserID assigneeId;
 
-    private LocalDateTime resolved_at;
-    private Boolean ticket_option;
+    private LocalDateTime resolvedAt;
+    private Boolean ticketOption;
+    private String issueScreenUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_coincidence_id", nullable = true)
+    @JoinColumn(name = "issue_coincidence_id")
     private IssueCoincidence issueCoincidence;
-
 
     public IssueReport() {}
 
-    public IssueReport(UUID companyID, String title, String description,
+    public IssueReport(UUID companyId, String title, String description,
                        ScreenLocation screenLocation, CompanyRole companyRole,
-                       Integer severity, String imgUrl, Integer status,
-                       UUID reporterID, UUID assigneeID, LocalDateTime resolved_at,
-                       Boolean ticket_option, IssueCoincidence issueCoincidence) {
-        this.companyID = new CompanyID(companyID);
+                       String severity, String imgUrl, UUID reporterId, String issueScreenUrl) {
+        this.companyId = new CompanyID(companyId);
         this.title = title;
         this.description = description;
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
-        this.severity = Severity.values()[severity];
+        this.severity = Severity.valueOf(severity);
         this.imgUrl = imgUrl;
-        this.status = Status.values()[status];
-        this.reporterID = new UserID(reporterID);
-        this.assigneeID = new UserID(assigneeID);
-        this.resolved_at = resolved_at;
-        this.ticket_option = ticket_option;
-        this.issueCoincidence = issueCoincidence;
+        this.status = Status.OPEN;
+        this.reporterId = new UserID(reporterId);
+        this.assigneeId = null;
+        this.resolvedAt = null;
+        this.ticketOption = false;
+        this.issueCoincidence = null;
+        this.issueScreenUrl = issueScreenUrl;
+    }
+
+    public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
+                       CompanyRole companyRole) {
+        this.companyId = new CompanyID(command.companyId());
+        this.title = command.title();
+        this.description = command.description();
+        this.screenLocation = screenLocation;
+        this.companyRole = companyRole;
+        this.severity = Severity.valueOf(command.severity());
+        this.imgUrl = command.imgUrl();
+        this.status = Status.OPEN;
+        this.reporterId = new UserID(command.reporterId());
+        this.assigneeId = null;
+        this.resolvedAt = null;
+        this.ticketOption = false;
+        this.issueCoincidence = null;
+        this.issueScreenUrl = command.issueScreenUrl();
     }
 }

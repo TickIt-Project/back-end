@@ -9,6 +9,7 @@ public record UserResource(
         String password,
         Boolean notify_active,
         String role,
-        String companyName
+        String companyName,
+        UUID companyRoleId
 ) {
 }

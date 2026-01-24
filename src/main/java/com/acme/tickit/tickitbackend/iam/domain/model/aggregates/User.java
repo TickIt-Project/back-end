@@ -2,13 +2,15 @@ package com.acme.tickit.tickitbackend.iam.domain.model.aggregates;
 
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
+import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyRoleId;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Password;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -32,28 +34,33 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = false)
     private Company company;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_role_id")
-    private CompanyRole companyRole;
+    @Embedded
+    private CompanyRoleId companyRoleId;
 
     public User() {}
 
-    public User(String username, String email, String password, Boolean notify_active, Role role, Company company, CompanyRole companyRole) {
+    public User(String username, String email, String password, Boolean notify_active, Role role, Company company, UUID companyRoleId) {
         this.personalData = new PersonalData(username, email);
         this.password = new Password(password);
         this.notify_active = notify_active;
         this.role = role;
         this.company = company;
-        if (companyRole != null) this.companyRole = companyRole;
+        this.companyRoleId = companyRoleId != null
+                ? new CompanyRoleId(companyRoleId)
+                : null;
+
     }
 
-    public User(CreateUserCommand command, String encryptPassword, Company company, Role role, CompanyRole companyRole) {
+    public User(CreateUserCommand command, String encryptPassword, Company company, Role role) {
         this.personalData = new PersonalData(command.username(), command.email());
         this.password = new Password(encryptPassword);
         this.notify_active = command.notify_active();
         this.company = company;
         this.role = role;
-        if (companyRole != null) this.companyRole = companyRole;
+        this.companyRoleId = command.companyRoleId() != null
+                ? new CompanyRoleId(command.companyRoleId())
+                : null;
+
     }
 
     public void updatePassword(String newPassword) {

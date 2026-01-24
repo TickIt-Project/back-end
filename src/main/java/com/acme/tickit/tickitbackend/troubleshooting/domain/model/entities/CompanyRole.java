@@ -29,9 +29,6 @@ public class CompanyRole extends AuditableModel {
     @OneToMany(mappedBy = "companyRole", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<IssueReport> issueReports = new ArrayList<>();
 
-    @OneToMany(mappedBy = "companyRole", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<User> users = new ArrayList<>();
-
     public CompanyRole() {}
 
     public CompanyRole(CreateCompanyRoleCommand command) {

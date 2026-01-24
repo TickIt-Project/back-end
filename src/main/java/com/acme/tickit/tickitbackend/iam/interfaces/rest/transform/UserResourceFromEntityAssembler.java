@@ -12,7 +12,10 @@ public class UserResourceFromEntityAssembler {
                 entity.getPassword().password(),
                 entity.getNotify_active(),
                 entity.getRole().getStringName(),
-                entity.getCompany().getCompanyName()
+                entity.getCompany().getCompanyName(),
+                entity.getCompanyRoleId() != null
+                        ? entity.getCompanyRoleId().companyRoleId()
+                        : null
         );
     }
 }

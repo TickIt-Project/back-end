@@ -6,5 +6,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CompanyRoleContextFacade {
-    Optional<CompanyRole> GetCompanyRoleById(UUID companyRoleId);
+    Boolean ExistsCompanyRoleById(UUID companyRoleId);
 }

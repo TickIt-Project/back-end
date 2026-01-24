@@ -15,7 +15,7 @@ public class ExternalCompanyRoleService {
         this.companyRoleContextFacade = companyRoleContextFacade;
     }
 
-    public Optional<CompanyRole> GetCompanyRoleById(UUID companyRoleId) {
-        return companyRoleContextFacade.GetCompanyRoleById(companyRoleId);
+    public Boolean ExistsCompanyRoleById(UUID companyRoleId) {
+        return companyRoleContextFacade.ExistsCompanyRoleById(companyRoleId);
     }
 }
