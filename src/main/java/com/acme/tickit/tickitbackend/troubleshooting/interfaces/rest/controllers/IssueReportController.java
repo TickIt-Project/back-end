@@ -6,9 +6,11 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReport
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportQueryService;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.IssueReportResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateIssueReportResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.UpdateIssueReportAssigneeResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.UpdateIssueReportStatusResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.IssueReportResourceFromEntityAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CreateIssueReportCommandFromResourceAssembler;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateIssueReportAssigneeCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateIssueReportStatusCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -90,6 +92,21 @@ public class IssueReportController {
     })
     public ResponseEntity<IssueReportResource> updateIssueReportStatus(@PathVariable UUID issueReportId, @RequestBody UpdateIssueReportStatusResource resource) {
         var command = UpdateIssueReportStatusCommandFromResourceAssembler.toCommandFromResource(issueReportId, resource);
+        var updateIssueReport = issueReportCommandService.handle(command);
+        if (updateIssueReport.isEmpty()) return ResponseEntity.badRequest().build();
+        var issueReportEntity = updateIssueReport.get();
+        var issueReportResource = IssueReportResourceFromEntityAssembler.toResourceFromEntity(issueReportEntity);
+        return ResponseEntity.ok(issueReportResource);
+    }
+
+    @PatchMapping("/{issueReportId}/assignee")
+    @Operation(summary = "Update issue report assignee", description = "Updates the assignee of a issue report")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Issue Report assignee updated"),
+            @ApiResponse(responseCode = "404", description = "Issue Report not found")
+    })
+    public ResponseEntity<IssueReportResource> updateIssueReportAssignee(@PathVariable UUID issueReportId, @RequestBody UpdateIssueReportAssigneeResource resource) {
+        var command = UpdateIssueReportAssigneeCommandFromResourceAssembler.toCommandFromResource(issueReportId, resource);
         var updateIssueReport = issueReportCommandService.handle(command);
         if (updateIssueReport.isEmpty()) return ResponseEntity.badRequest().build();
         var issueReportEntity = updateIssueReport.get();
