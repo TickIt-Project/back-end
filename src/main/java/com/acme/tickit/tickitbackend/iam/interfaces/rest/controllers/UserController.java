@@ -63,7 +63,7 @@ public class UserController {
         return ResponseEntity.ok(userResources);
     }
 
-    @PatchMapping("/{companyId}/status")
+    @PatchMapping("/{companyId}/password")
     @Operation(summary = "Update user password", description = "Updates the password of a user based on its username")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User password updated"),
