@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/roles", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Roles", description = "Available Role Endpoints")
-@SecurityRequirement(name = "bearerAuth")
 public class RoleController {
     private final RoleQueryService roleQueryService;
 
