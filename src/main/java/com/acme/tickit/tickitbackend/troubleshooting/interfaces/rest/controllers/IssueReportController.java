@@ -2,6 +2,9 @@ package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.controller
 
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetAllIssueReportsQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetIssueReportByIdQuery;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetIssueReportsByFiltersQuery;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Severity;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Status;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportQueryService;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.IssueReportResource;
@@ -112,5 +115,31 @@ public class IssueReportController {
         var issueReportEntity = updateIssueReport.get();
         var issueReportResource = IssueReportResourceFromEntityAssembler.toResourceFromEntity(issueReportEntity);
         return ResponseEntity.ok(issueReportResource);
+    }
+
+    @GetMapping("/{companyId}/filter")
+    @Operation(summary = "Get Issue Reports by filters", description = "Get available Issue Reports in the system by filters.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Issue Reports retrieved successfully.")})
+    public ResponseEntity<List<IssueReportResource>> getIssueReportsByFilters(
+            @PathVariable UUID companyId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) UUID assigneeId,
+            @RequestParam(required = false) UUID reporterId,
+            @RequestParam(required = false) Severity severity,
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false) UUID screenLocationId
+    ) {
+        var getIssueReportsByFiltersQuery = new GetIssueReportsByFiltersQuery(
+                companyId, title, assigneeId, reporterId,
+                severity != null ? severity.name() : null,
+                status != null ? status.name() : null,
+                screenLocationId
+        );
+        var issueReports = issueReportQueryService.handle(getIssueReportsByFiltersQuery);
+        var issueReportResources = issueReports.stream()
+                .map(IssueReportResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+        return ResponseEntity.ok(issueReportResources);
     }
 }

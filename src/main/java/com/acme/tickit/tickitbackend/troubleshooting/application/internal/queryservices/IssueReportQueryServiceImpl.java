@@ -4,6 +4,9 @@ import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetAllIssueReportsQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetIssueReportByIdQuery;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetIssueReportsByFiltersQuery;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Severity;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Status;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportQueryService;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.IssueReportRepository;
 import org.springframework.stereotype.Service;
@@ -27,5 +30,22 @@ public class IssueReportQueryServiceImpl implements IssueReportQueryService {
     @Override
     public List<IssueReport> handle(GetAllIssueReportsQuery query) {
         return issueReportRepository.findAllByCompanyId(new CompanyID(query.companyId()));
+    }
+
+    @Override
+    public List<IssueReport> handle(GetIssueReportsByFiltersQuery query) {
+        return issueReportRepository.findByFilters(
+                query.companyId(),
+                query.title(),
+                query.assigneeId(),
+                query.reporterId(),
+                query.severity() != null
+                        ? Severity.valueOf(query.severity())
+                        : null,
+                query.status() != null
+                        ? Status.valueOf(query.status())
+                        : null,
+                query.screenLocationId()
+        );
     }
 }
