@@ -1,23 +1,16 @@
 package com.acme.tickit.tickitbackend.iam.application.internal.queryservices;
 
-import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.HashingService;
-import com.acme.tickit.tickitbackend.iam.domain.exceptions.InvalidPasswordException;
-import com.acme.tickit.tickitbackend.iam.domain.exceptions.UserNotFoundException;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
-import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersByRoleQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserQueryService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
-import com.acme.tickit.tickitbackend.shared.infrastructure.multitenancy.TenantContext;
-import com.acme.tickit.tickitbackend.shared.infrastructure.security.JwtService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserQueryServiceImpl implements UserQueryService {

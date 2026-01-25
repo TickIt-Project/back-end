@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.troubleshooting.application.internal.queryservices;
 
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetAllIssueReportsQuery;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetIssueReportByIdQuery;
@@ -25,6 +26,6 @@ public class IssueReportQueryServiceImpl implements IssueReportQueryService {
 
     @Override
     public List<IssueReport> handle(GetAllIssueReportsQuery query) {
-        return issueReportRepository.findAllByCompanyId(query.companyId());
+        return issueReportRepository.findAllByCompanyId(new CompanyID(query.companyId()));
     }
 }
