@@ -93,8 +93,8 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public Optional<User> handle(UpdateUserPasswordCommand command) {
-        User user = userRepository.findByCompany_IdAndPersonalData_Name(command.tenantId(), command.username())
-                .orElseThrow(() -> new UserNotFoundException(command.username()));
+        User user = userRepository.findByCompany_IdAndId(command.tenantId(), command.userId())
+                .orElseThrow(() -> new UserNotFoundException(command.userId().toString()));
         if (!hashingService.matches(command.oldPassword(), user.getPassword().password()))
             throw new InvalidPasswordException();
         try {
