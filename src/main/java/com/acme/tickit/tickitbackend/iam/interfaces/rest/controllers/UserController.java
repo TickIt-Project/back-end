@@ -2,6 +2,7 @@ package com.acme.tickit.tickitbackend.iam.interfaces.rest.controllers;
 
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
+import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersByRoleQuery;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserQueryService;
@@ -33,7 +34,7 @@ public class UserController {
         this.userQueryService = userQueryService;
     }
 
-    @GetMapping("/{companyId}")
+    @GetMapping("/{companyId}/users")
     @Operation(summary = "Get all users", description = "Get all users for the current tenant")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully.")})
@@ -44,6 +45,20 @@ public class UserController {
                 .map(UserResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
         return ResponseEntity.ok(userResources);
+    }
+
+    @GetMapping("/{userId}")
+    @Operation(summary = "Get User by id", description = "Get User by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "404", description = "User not found")})
+    public ResponseEntity<UserResource> getUserById(@PathVariable UUID userId) {
+        var getUserByIdQuery = new GetUserByIdQuery(userId);
+        var user = userQueryService.handle(getUserByIdQuery);
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+        var userEntity = user.get();
+        var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(userEntity);
+        return ResponseEntity.ok(userResource);
     }
 
     @GetMapping("/{companyId}/roles")
@@ -63,8 +78,8 @@ public class UserController {
         return ResponseEntity.ok(userResources);
     }
 
-    @PatchMapping("/{companyId}/status")
-    @Operation(summary = "Update user password", description = "Updates the password of a user based on its username")
+    @PatchMapping("/{companyId}/password")
+    @Operation(summary = "Update user password", description = "Updates the password of a user based on its id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User password updated"),
             @ApiResponse(responseCode = "404", description = "User not found")

@@ -1,7 +1,7 @@
-package com.acme.tickit.tickitbackend.troubleshooting.rest.transform;
+package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform;
 
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateCompanyRoleCommand;
-import com.acme.tickit.tickitbackend.troubleshooting.rest.resources.CreateCompanyRoleResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateCompanyRoleResource;
 
 public class CreateCompanyRoleCommandFromResourceAssembler {
     public static CreateCompanyRoleCommand toCommandFromResource(CreateCompanyRoleResource resource) {

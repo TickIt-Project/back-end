@@ -109,14 +109,14 @@ public class WebSecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/webjars/**",
-                                "/api/v1/users/**",
                                 "/api/v1/companies/**",
-                                "api/v1/authentication/**"
+                                "api/v1/authentication/**",
+                                "/api/v1/roles/**"
                         ).permitAll()
-                        .requestMatchers("/api/v1/roles/**").authenticated()
                         .requestMatchers("/api/v1/users/**").authenticated()
                         .requestMatchers("/api/v1/company-roles/**").authenticated()
                         .requestMatchers("api/v1/screen-locations/**").authenticated()
+                        .requestMatchers("/api/v1/issue-reports/**").authenticated()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);

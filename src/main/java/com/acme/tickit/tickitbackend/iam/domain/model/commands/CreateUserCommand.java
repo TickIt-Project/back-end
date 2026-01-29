@@ -3,10 +3,12 @@ package com.acme.tickit.tickitbackend.iam.domain.model.commands;
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public record CreateUserCommand(String username, String email,
                                 String role, String password,
-                                Boolean notify_active, String companyCode) {
+                                Boolean notify_active, String companyCode,
+                                UUID companyRoleId) {
     public CreateUserCommand {
         if (username == null || username.length() < 2) {
             throw new UserNameNotAcceptedException();

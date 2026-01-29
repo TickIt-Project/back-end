@@ -2,25 +2,22 @@ package com.acme.tickit.tickitbackend.iam.application.internal.commandservices;
 
 import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.HashingService;
 import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.TokenService;
+import com.acme.tickit.tickitbackend.iam.application.internal.outboundservices.acl.ExternalCompanyRoleService;
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.UpdateUserPasswordCommand;
-import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
-import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.CompanyRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
-import com.acme.tickit.tickitbackend.shared.infrastructure.multitenancy.TenantContext;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
 import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,16 +30,20 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final RoleRepository roleRepository;
     private final HashingService hashingService;
     private final TokenService tokenService;
+    private final ExternalCompanyRoleService externalCompanyRoleService;
 
     public UserCommandServiceImpl(UserRepository userRepository,
                                   HashingService hashingService,
                                   CompanyRepository companyRepository,
-                                  RoleRepository roleRepository, TokenService tokenService) {
+                                  RoleRepository roleRepository,
+                                  TokenService tokenService,
+                                  ExternalCompanyRoleService externalCompanyRoleService) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.companyRepository = companyRepository;
         this.roleRepository = roleRepository;
         this.tokenService = tokenService;
+        this.externalCompanyRoleService = externalCompanyRoleService;
     }
 
     @Override
@@ -58,6 +59,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (Objects.equals(command.role(), "IT_HEAD") &&
             userRepository.existsByCompany_CodeAndRole_Name(new CompanyCode(command.companyCode()), Roles.valueOf(command.role())))
             throw new ItHeadRepeatedException();
+        if (command.companyRoleId() != null && !externalCompanyRoleService.ExistsCompanyRoleById(command.companyRoleId()))
+            throw new CompanyRoleNotFoundException(command.companyRoleId().toString());
         var company = companyRepository.findByCode(new CompanyCode(command.companyCode())).get();
         var role = roleRepository.findByName(Roles.valueOf(command.role())).get();
         var finalPassword = command.password();
@@ -90,8 +93,8 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public Optional<User> handle(UpdateUserPasswordCommand command) {
-        User user = userRepository.findByCompany_IdAndPersonalData_Name(command.tenantId(), command.username())
-                .orElseThrow(() -> new UserNotFoundException(command.username()));
+        User user = userRepository.findByCompany_IdAndId(command.tenantId(), command.userId())
+                .orElseThrow(() -> new UserNotFoundException(command.userId().toString()));
         if (!hashingService.matches(command.oldPassword(), user.getPassword().password()))
             throw new InvalidPasswordException();
         try {

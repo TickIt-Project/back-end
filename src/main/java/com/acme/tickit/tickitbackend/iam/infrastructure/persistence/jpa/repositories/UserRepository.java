@@ -2,7 +2,6 @@ package com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.reposit
 
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
-import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -22,4 +21,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByCompany_IdAndRole_Name(UUID companyId, Roles roleName);
     Optional<User> findByCompany_IdAndPersonalData_Name(UUID companyId, String name);
     Optional<User> findByPersonalData_Email(String email);
+    Optional<User> findByCompany_IdAndId(UUID companyId, UUID id);
 }
