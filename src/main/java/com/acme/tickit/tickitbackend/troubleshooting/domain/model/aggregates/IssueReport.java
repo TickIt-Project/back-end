@@ -63,6 +63,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     @JoinColumn(name = "issue_coincidence_id")
     private IssueCoincidence issueCoincidence;
 
+    private Boolean coincidenceAvailable;
+
     public IssueReport() {}
 
     public IssueReport(UUID companyId, String title, String description,
@@ -82,6 +84,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.ticketOption = false;
         this.issueCoincidence = null;
         this.issueScreenUrl = issueScreenUrl;
+        this.coincidenceAvailable = false;
     }
 
     public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
@@ -100,6 +103,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.ticketOption = false;
         this.issueCoincidence = null;
         this.issueScreenUrl = command.issueScreenUrl();
+        this.coincidenceAvailable = false;
     }
 
     public void updateStatus(String newStatus) {
