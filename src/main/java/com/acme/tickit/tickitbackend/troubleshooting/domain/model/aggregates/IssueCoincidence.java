@@ -27,7 +27,12 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
     @Column(name = "description", length = 3500)
     private String description;
 
-    @OneToMany(mappedBy = "issueCoincidence", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany
+    @JoinTable(
+            name = "issue_coincidence_issue_reports",
+            joinColumns = @JoinColumn(name = "issue_coincidence_id"),
+            inverseJoinColumns = @JoinColumn(name = "issue_report_id")
+    )
     private List<IssueReport> issueReports = new ArrayList<>();
 
     private Boolean jiraSynced;
@@ -35,8 +40,8 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
 
     @ElementCollection
     @CollectionTable(
-            name = "issue_report_keywords",
-            joinColumns = @JoinColumn(name = "issue_report_id")
+            name = "issue_coincidence_keywords",
+            joinColumns = @JoinColumn(name = "issue_coincidence_id")
     )
     private List<Keyword> keywords = new ArrayList<>();
 
@@ -53,18 +58,18 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
         this.jiraSyncedAt = null;
     }
 
-    // --- issueReports (OneToMany) ---
+    // --- issueReports (ManyToMany) ---
 
     public void addIssueReport(IssueReport report) {
         if (!issueReports.contains(report)) {
             issueReports.add(report);
-            report.setIssueCoincidence(this);
+            report.getIssueCoincidences().add(this);
         }
     }
 
     public void removeIssueReport(IssueReport report) {
         if (issueReports.remove(report)) {
-            report.setIssueCoincidence(null);
+            report.getIssueCoincidences().remove(this);
         }
     }
 

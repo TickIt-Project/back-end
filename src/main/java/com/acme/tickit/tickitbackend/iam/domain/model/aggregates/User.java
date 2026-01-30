@@ -3,7 +3,7 @@ package com.acme.tickit.tickitbackend.iam.domain.model.aggregates;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyRoleId;
-import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Language;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Password;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;

@@ -38,4 +38,9 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, UUID> 
             UUID screenLocationId
     );
 
+    List<IssueReport> findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndIdNot(
+            UUID companyId,
+            UUID excludeId
+    );
+
 }

@@ -1,6 +1,6 @@
 package com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.connectionwords;
 
-import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Language;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
