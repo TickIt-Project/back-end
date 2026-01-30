@@ -45,12 +45,53 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
 
     public IssueCoincidence() {}
 
-    public IssueCoincidence(UUID companyID, String title, String description,
-                            Boolean jiraSynced, LocalDateTime jiraSyncedAt) {
+    public IssueCoincidence(UUID companyID, String title, String description) {
         this.companyID = new CompanyID(companyID);
         this.title = title;
         this.description = description;
-        this.jiraSynced = jiraSynced;
-        this.jiraSyncedAt = jiraSyncedAt;
+        this.jiraSynced = false;
+        this.jiraSyncedAt = null;
+    }
+
+    // --- issueReports (OneToMany) ---
+
+    public void addIssueReport(IssueReport report) {
+        if (!issueReports.contains(report)) {
+            issueReports.add(report);
+            report.setIssueCoincidence(this);
+        }
+    }
+
+    public void removeIssueReport(IssueReport report) {
+        if (issueReports.remove(report)) {
+            report.setIssueCoincidence(null);
+        }
+    }
+
+    // --- keywords (ElementCollection) ---
+
+    public void addKeyword(Keyword keyword) {
+        if (!keywords.contains(keyword)) {
+            keywords.add(keyword);
+        }
+    }
+
+    public void removeKeyword(Keyword keyword) {
+        keywords.remove(keyword);
+    }
+
+    // --- screenLocations (ManyToMany) ---
+
+    public void addScreenLocation(ScreenLocation screenLocation) {
+        if (!screenLocations.contains(screenLocation)) {
+            screenLocations.add(screenLocation);
+            screenLocation.getIssueCoincidences().add(this);
+        }
+    }
+
+    public void removeScreenLocation(ScreenLocation screenLocation) {
+        if (screenLocations.remove(screenLocation)) {
+            screenLocation.getIssueCoincidences().remove(this);
+        }
     }
 }
