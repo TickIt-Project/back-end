@@ -8,7 +8,7 @@ import java.util.UUID;
 public record CreateUserCommand(String username, String email,
                                 String role, String password,
                                 Boolean notify_active, String companyCode,
-                                UUID companyRoleId) {
+                                UUID companyRoleId, String language) {
     public CreateUserCommand {
         if (username == null || username.length() < 2) {
             throw new UserNameNotAcceptedException();

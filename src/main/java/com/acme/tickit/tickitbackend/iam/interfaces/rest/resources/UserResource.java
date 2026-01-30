@@ -10,6 +10,7 @@ public record UserResource(
         Boolean notify_active,
         String role,
         String companyName,
-        UUID companyRoleId
+        UUID companyRoleId,
+        String language
 ) {
 }

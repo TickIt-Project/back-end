@@ -12,7 +12,8 @@ public class CreateUserCommandFromResourceAssembler {
                 resource.password(),
                 resource.notify_active(),
                 resource.companyCode(),
-                resource.companyRoleId()
+                resource.companyRoleId(),
+                resource.language()
         );
     }
 }
