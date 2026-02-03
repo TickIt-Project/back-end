@@ -11,20 +11,23 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.Creat
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportAssigneeCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportStatusCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedForCoincidenceEvent;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.ConnectionWords;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.connectionwords.ConnectionWords;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.IssueReportRepository;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.ScreenLocationRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class IssueReportCommandServiceImpl implements IssueReportCommandService {
 
-    private static final int MIN_MEANINGFUL_WORDS_FOR_COINCIDENCE = 50;
+    private static final int MIN_MEANINGFUL_WORDS_FOR_COINCIDENCE = 40;
 
     private final IssueReportRepository issueReportRepository;
     private final ExternalUserService externalUserService;
@@ -45,6 +48,7 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
     }
 
     @Override
+    @Transactional
     public UUID handle(CreateIssueReportCommand command) {
         if (!externalCompanyService.ExistsCompanyById(command.companyId()))
             throw new CompanyIdNotFoundException(command.companyId().toString());
@@ -100,6 +104,7 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
     private boolean calculateCoincidenceAvailable(CreateIssueReportCommand command) {
         Language language = externalUserService.getLanguageByUserId(command.reporterId()).orElse(Language.EN);
         String[] meaningfulWords = ConnectionWords.filterMeaningfulWords(command.description(), language);
+        log.info("Número de palabras significativas: {}", meaningfulWords.length);
         boolean hasEnoughWords = meaningfulWords.length >= MIN_MEANINGFUL_WORDS_FOR_COINCIDENCE;
         boolean hasUrl = hasUrl(command.imgUrl()) || hasUrl(command.issueScreenUrl());
         return hasEnoughWords && hasUrl;

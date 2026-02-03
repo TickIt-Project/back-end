@@ -28,7 +28,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     @Column(name = "title", length = 100)
     private String title;
 
-    @Column(name = "description")
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -24,7 +24,8 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
     @Column(name = "title", length = 100)
     private String title;
 
-    @Column(name = "description", length = 3500)
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @ManyToMany

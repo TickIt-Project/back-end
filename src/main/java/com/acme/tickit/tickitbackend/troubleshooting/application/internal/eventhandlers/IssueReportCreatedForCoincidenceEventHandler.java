@@ -5,14 +5,15 @@ import com.acme.tickit.tickitbackend.troubleshooting.application.internal.outbou
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueCoincidence;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedForCoincidenceEvent;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.ConnectionWords;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.connectionwords.ConnectionWords;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Keyword;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.IssueCoincidenceRepository;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.IssueReportRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -39,7 +40,12 @@ public class IssueReportCreatedForCoincidenceEventHandler {
         this.externalUserService = externalUserService;
     }
 
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleBefore(IssueReportCreatedForCoincidenceEvent event) {
+        LOGGER.info("EVENT BEFORE COMMIT {}", event.issueReportId());
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(IssueReportCreatedForCoincidenceEvent event) {
         Optional<IssueReport> newReportOpt = issueReportRepository.findById(event.issueReportId());
