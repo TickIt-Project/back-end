@@ -24,10 +24,16 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
     @Column(name = "title", length = 100)
     private String title;
 
-    @Column(name = "description", length = 3500)
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "issueCoincidence", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany
+    @JoinTable(
+            name = "issue_coincidence_issue_reports",
+            joinColumns = @JoinColumn(name = "issue_coincidence_id"),
+            inverseJoinColumns = @JoinColumn(name = "issue_report_id")
+    )
     private List<IssueReport> issueReports = new ArrayList<>();
 
     private Boolean jiraSynced;
@@ -35,8 +41,8 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
 
     @ElementCollection
     @CollectionTable(
-            name = "issue_report_keywords",
-            joinColumns = @JoinColumn(name = "issue_report_id")
+            name = "issue_coincidence_keywords",
+            joinColumns = @JoinColumn(name = "issue_coincidence_id")
     )
     private List<Keyword> keywords = new ArrayList<>();
 
@@ -45,12 +51,53 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
 
     public IssueCoincidence() {}
 
-    public IssueCoincidence(UUID companyID, String title, String description,
-                            Boolean jiraSynced, LocalDateTime jiraSyncedAt) {
+    public IssueCoincidence(UUID companyID, String title, String description) {
         this.companyID = new CompanyID(companyID);
         this.title = title;
         this.description = description;
-        this.jiraSynced = jiraSynced;
-        this.jiraSyncedAt = jiraSyncedAt;
+        this.jiraSynced = false;
+        this.jiraSyncedAt = null;
+    }
+
+    // --- issueReports (ManyToMany) ---
+
+    public void addIssueReport(IssueReport report) {
+        if (!issueReports.contains(report)) {
+            issueReports.add(report);
+            report.getIssueCoincidences().add(this);
+        }
+    }
+
+    public void removeIssueReport(IssueReport report) {
+        if (issueReports.remove(report)) {
+            report.getIssueCoincidences().remove(this);
+        }
+    }
+
+    // --- keywords (ElementCollection) ---
+
+    public void addKeyword(Keyword keyword) {
+        if (!keywords.contains(keyword)) {
+            keywords.add(keyword);
+        }
+    }
+
+    public void removeKeyword(Keyword keyword) {
+        keywords.remove(keyword);
+    }
+
+    // --- screenLocations (ManyToMany) ---
+
+    public void addScreenLocation(ScreenLocation screenLocation) {
+        if (!screenLocations.contains(screenLocation)) {
+            screenLocations.add(screenLocation);
+            screenLocation.getIssueCoincidences().add(this);
+        }
+    }
+
+    public void removeScreenLocation(ScreenLocation screenLocation) {
+        if (screenLocations.remove(screenLocation)) {
+            screenLocation.getIssueCoincidences().remove(this);
+        }
     }
 }

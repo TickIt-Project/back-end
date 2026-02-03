@@ -26,7 +26,8 @@ public class IssueReportResourceFromEntityAssembler {
                 entity.getCreatedAt(),
                 entity.getResolvedAt(),
                 entity.getTicketOption(),
-                entity.getIssueScreenUrl() != null ? entity.getIssueScreenUrl() : ""
+                entity.getIssueScreenUrl() != null ? entity.getIssueScreenUrl() : "",
+                entity.getCoincidenceAvailable()
         );
     }
 }

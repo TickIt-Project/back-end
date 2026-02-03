@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -26,7 +28,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     @Column(name = "title", length = 100)
     private String title;
 
-    @Column(name = "description")
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,9 +62,10 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     private Boolean ticketOption;
     private String issueScreenUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_coincidence_id")
-    private IssueCoincidence issueCoincidence;
+    @ManyToMany(mappedBy = "issueReports")
+    private List<IssueCoincidence> issueCoincidences = new ArrayList<>();
+
+    private Boolean coincidenceAvailable;
 
     public IssueReport() {}
 
@@ -80,12 +84,12 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.assigneeId = null;
         this.resolvedAt = null;
         this.ticketOption = false;
-        this.issueCoincidence = null;
         this.issueScreenUrl = issueScreenUrl;
+        this.coincidenceAvailable = false;
     }
 
     public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
-                       CompanyRole companyRole) {
+                       CompanyRole companyRole, Boolean coincidenceAvailable) {
         this.companyId = new CompanyID(command.companyId());
         this.title = command.title();
         this.description = command.description();
@@ -98,8 +102,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.assigneeId = null;
         this.resolvedAt = null;
         this.ticketOption = false;
-        this.issueCoincidence = null;
         this.issueScreenUrl = command.issueScreenUrl();
+        this.coincidenceAvailable = coincidenceAvailable;
     }
 
     public void updateStatus(String newStatus) {
