@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -24,13 +25,39 @@ public class ItMemberStatistics extends AuditableAbstractAggregateRoot<ItMemberS
     private Integer issuesAssignedCount;
     private Integer issuesResolvedCount;
 
+    private LocalDateTime lastUpdatedDate;
+
     public ItMemberStatistics() {}
 
-    public ItMemberStatistics(UUID companyID, UUID itMemberId,
-                              Integer issuesAssignedCount, Integer issuesResolvedCount) {
+    public ItMemberStatistics(UUID companyID, UUID itMemberId) {
         this.companyID = new CompanyID(companyID);
         this.itMemberId = new ItMemberId(itMemberId);
-        this.issuesAssignedCount = issuesAssignedCount;
-        this.issuesResolvedCount = issuesResolvedCount;
+        this.issuesAssignedCount = 0;
+        this.issuesResolvedCount = 0;
+        this.lastUpdatedDate = LocalDateTime.now();
+    }
+
+    public void updateDate() {
+        this.lastUpdatedDate = LocalDateTime.now();
+    }
+
+    public void IncreaseIssuesAssignedCount() {
+        this.issuesAssignedCount++;
+        this.updateDate();
+    }
+
+    public void DecreaseIssuesAssignedCount() {
+        this.issuesAssignedCount--;
+        this.updateDate();
+    }
+
+    public void IncreaseIssuesResolvedCount() {
+        this.issuesResolvedCount++;
+        this.updateDate();
+    }
+
+    public void DecreaseIssuesResolvedCount() {
+        this.issuesResolvedCount--;
+        this.updateDate();
     }
 }
