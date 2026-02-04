@@ -10,7 +10,9 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.Iss
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateIssueReportCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportAssigneeCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportStatusCommand;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportAssigneeChangedEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedForCoincidenceEvent;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportStatusChangedEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.connectionwords.ConnectionWords;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.services.IssueReportCommandService;
 import com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories.IssueReportRepository;
@@ -74,12 +76,21 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
     }
 
     @Override
+    @Transactional
     public Optional<IssueReport> handle(UpdateIssueReportStatusCommand command) {
         IssueReport issueReport = issueReportRepository.findById(command.issueReportId())
                 .orElseThrow(() -> new IssueReportNotFoundException(command.issueReportId().toString()));
+        var previousStatus = issueReport.getStatus().name();
         try {
             issueReport.updateStatus(command.status());
             issueReportRepository.save(issueReport);
+            eventPublisher.publishEvent(new IssueReportStatusChangedEvent(
+                    issueReport.getId(),
+                    issueReport.getCompanyId().companyId(),
+                    previousStatus,
+                    command.status(),
+                    issueReport.getAssigneeId() != null ? issueReport.getAssigneeId().userId() : null
+            ));
         } catch (Exception e) {
             throw new IssueReportNotSavedException(e.getMessage());
         }
@@ -87,14 +98,24 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
     }
 
     @Override
+    @Transactional
     public Optional<IssueReport> handle(UpdateIssueReportAssigneeCommand command) {
         IssueReport issueReport = issueReportRepository.findById(command.issueReportId())
                 .orElseThrow(() -> new IssueReportNotFoundException(command.issueReportId().toString()));
         if (!externalUserService.ExistsUserById(command.assigneeId()))
             throw new AssigneeUserNotFoundException(command.assigneeId().toString());
+        var previousAssigneeId = issueReport.getAssigneeId() != null
+                ? issueReport.getAssigneeId().userId()
+                : null;
         try {
             issueReport.updateAssigneeId(command.assigneeId());
             issueReportRepository.save(issueReport);
+            eventPublisher.publishEvent(new IssueReportAssigneeChangedEvent(
+                    issueReport.getId(),
+                    issueReport.getCompanyId().companyId(),
+                    previousAssigneeId,
+                    command.assigneeId()
+            ));
         } catch (Exception e) {
             throw new IssueReportNotSavedException(e.getMessage());
         }

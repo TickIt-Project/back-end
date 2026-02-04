@@ -113,6 +113,9 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
             newStatus.toUpperCase().equals(Status.CLOSED.name()) ||
             newStatus.toUpperCase().equals(Status.CANCELLED.name())) {
             this.status = Status.valueOf(newStatus);
+            if (this.status == Status.CLOSED) {
+                this.resolvedAt = LocalDateTime.now();
+            }
         }
     }
 

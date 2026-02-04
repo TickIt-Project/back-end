@@ -9,6 +9,7 @@ import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.SignInCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.UpdateUserPasswordCommand;
+import com.acme.tickit.tickitbackend.iam.domain.model.events.UserCreatedEvent;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyCode;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserCommandService;
@@ -16,7 +17,9 @@ import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.reposito
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.Objects;
@@ -31,21 +34,25 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final HashingService hashingService;
     private final TokenService tokenService;
     private final ExternalCompanyRoleService externalCompanyRoleService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UserCommandServiceImpl(UserRepository userRepository,
                                   HashingService hashingService,
                                   CompanyRepository companyRepository,
                                   RoleRepository roleRepository,
                                   TokenService tokenService,
-                                  ExternalCompanyRoleService externalCompanyRoleService) {
+                                  ExternalCompanyRoleService externalCompanyRoleService,
+                                  ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.companyRepository = companyRepository;
         this.roleRepository = roleRepository;
         this.tokenService = tokenService;
         this.externalCompanyRoleService = externalCompanyRoleService;
+        this.eventPublisher = eventPublisher;
     }
 
+    @Transactional
     @Override
     public UUID handle(CreateUserCommand command) {
         if (userRepository.existsByPersonalData_Name(command.username()))
@@ -75,6 +82,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         var user = new User(command, hashingService.encode(finalPassword), company, role);
         try {
             userRepository.save(user);
+            eventPublisher.publishEvent(new UserCreatedEvent(user.getId(), company.getId(), role.getName()));
         } catch (Exception e) {
             throw new UserNotCreatedException(e.getMessage());
         }
