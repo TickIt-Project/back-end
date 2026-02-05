@@ -3,6 +3,7 @@ package com.acme.tickit.tickitbackend.iam.domain.model.aggregates;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.entities.Role;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.CompanyRoleId;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Password;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.PersonalData;
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -37,9 +38,13 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @Embedded
     private CompanyRoleId companyRoleId;
 
+    @Enumerated(EnumType.STRING)
+    private Language language;
+
     public User() {}
 
-    public User(String username, String email, String password, Boolean notify_active, Role role, Company company, UUID companyRoleId) {
+    public User(String username, String email, String password, Boolean notify_active, 
+                Role role, Company company, UUID companyRoleId, Language language) {
         this.personalData = new PersonalData(username, email);
         this.password = new Password(password);
         this.notify_active = notify_active;
@@ -48,7 +53,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.companyRoleId = companyRoleId != null
                 ? new CompanyRoleId(companyRoleId)
                 : null;
-
+        this.language = language;
     }
 
     public User(CreateUserCommand command, String encryptPassword, Company company, Role role) {
@@ -60,7 +65,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.companyRoleId = command.companyRoleId() != null
                 ? new CompanyRoleId(command.companyRoleId())
                 : null;
-
+        this.language = Language.valueOf(command.language());
     }
 
     public void updatePassword(String newPassword) {

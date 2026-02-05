@@ -1,5 +1,6 @@
 package com.acme.tickit.tickitbackend.troubleshooting.application.internal.outboundservices.acl;
 
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.iam.interfaces.acl.UserContextFacade;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.queries.GetCompanyRoleByIdQuery;
@@ -29,5 +30,10 @@ public class ExternalUserService {
         var companyRoleId = user.get().getCompanyRoleId().companyRoleId();
         if (companyRoleId == null) return Optional.empty();
         return companyRoleQueryService.handle(new GetCompanyRoleByIdQuery(companyRoleId));
+    }
+
+    public Optional<Language> getLanguageByUserId(UUID userId) {
+        return this.userContextFacade.GetUserById(userId)
+                .map(user -> user.getLanguage());
     }
 }
