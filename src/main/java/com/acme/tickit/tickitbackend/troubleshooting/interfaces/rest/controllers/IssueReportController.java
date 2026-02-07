@@ -15,14 +15,17 @@ import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.I
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CreateIssueReportCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateIssueReportAssigneeCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateIssueReportStatusCommandFromResourceAssembler;
+import com.acme.tickit.tickitbackend.shared.application.external.ImageStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,20 +39,47 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class IssueReportController {
     private final IssueReportCommandService issueReportCommandService;
     private final IssueReportQueryService issueReportQueryService;
+    private final ImageStorageService imageStorageService;
 
-    public IssueReportController(IssueReportCommandService issueReportCommandService, IssueReportQueryService issueReportQueryService) {
+    public IssueReportController(IssueReportCommandService issueReportCommandService, IssueReportQueryService issueReportQueryService,
+                                 ImageStorageService imageStorageService) {
         this.issueReportCommandService = issueReportCommandService;
         this.issueReportQueryService = issueReportQueryService;
+        this.imageStorageService = imageStorageService;
     }
 
-    @PostMapping("/issue-report")
-    @Operation(summary = "Create a new Issue Report", description = "Create a new Issue Report")
+    @PostMapping(value = "/issue-report", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create a new Issue Report", description = "Create a new Issue Report. Use /issue-report/multipart for optional image.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Issue Report created"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "Issue Report not found")})
     public ResponseEntity<IssueReportResource> createIssueReport(@RequestBody CreateIssueReportResource resource) {
-        var createCommand = CreateIssueReportCommandFromResourceAssembler.toCommandFromResource(resource);
+        return createIssueReportWithImage(resource, null);
+    }
+
+    @PostMapping(value = "/issue-report/multipart", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Create a new Issue Report with optional image", description = "Create a new Issue Report with optional image (multipart/form-data)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Issue Report created"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Issue Report not found")})
+    public ResponseEntity<IssueReportResource> createIssueReportMultipart(
+            @RequestPart("issueReport") CreateIssueReportResource resource,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        String imgUrl = null;
+        if (image != null && !image.isEmpty()) {
+            try {
+                imgUrl = imageStorageService.upload(image.getBytes(), "issue-reports");
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        return createIssueReportWithImage(resource, imgUrl);
+    }
+
+    private ResponseEntity<IssueReportResource> createIssueReportWithImage(CreateIssueReportResource resource, String imgUrl) {
+        var createCommand = CreateIssueReportCommandFromResourceAssembler.toCommandFromResource(resource, imgUrl);
         var issueReportId = issueReportCommandService.handle(createCommand);
         if (issueReportId == null) return ResponseEntity.badRequest().build();
         var getIssueReportByIdQuery = new GetIssueReportByIdQuery(issueReportId);

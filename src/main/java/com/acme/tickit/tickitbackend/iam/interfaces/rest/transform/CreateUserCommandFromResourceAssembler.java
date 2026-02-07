@@ -5,6 +5,10 @@ import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.CreateUserRes
 
 public class CreateUserCommandFromResourceAssembler {
     public static CreateUserCommand toCommandFromResource(CreateUserResource resource) {
+        return toCommandFromResource(resource, resource.profileImageUrl());
+    }
+
+    public static CreateUserCommand toCommandFromResource(CreateUserResource resource, String profileImageUrlOverride) {
         return new CreateUserCommand(
                 resource.username(),
                 resource.email(),
@@ -13,7 +17,10 @@ public class CreateUserCommandFromResourceAssembler {
                 resource.notify_active(),
                 resource.companyCode(),
                 resource.companyRoleId(),
-                resource.language()
+                resource.language(),
+                profileImageUrlOverride != null ? profileImageUrlOverride : resource.profileImageUrl()
         );
     }
 }
+
+// CHECK THIS LATER

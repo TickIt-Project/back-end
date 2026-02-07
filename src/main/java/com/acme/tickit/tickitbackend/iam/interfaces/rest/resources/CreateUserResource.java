@@ -8,7 +8,8 @@ import java.util.UUID;
 public record CreateUserResource(String username, String email,
                                  String role, String password,
                                  Boolean notify_active, String companyCode,
-                                 UUID companyRoleId, String language) {
+                                 UUID companyRoleId, String language,
+                                 String profileImageUrl) {
     public CreateUserResource {
         if (username == null || username.length() < 2) {
             throw new UserNameNotAcceptedException();

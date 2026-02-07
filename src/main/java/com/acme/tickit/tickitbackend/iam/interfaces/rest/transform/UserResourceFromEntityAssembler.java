@@ -16,7 +16,8 @@ public class UserResourceFromEntityAssembler {
                 entity.getCompanyRoleId() != null
                         ? entity.getCompanyRoleId().companyRoleId()
                         : null,
-                entity.getLanguage().name()
+                entity.getLanguage().name(),
+                entity.getProfileImageUrl()
         );
     }
 }

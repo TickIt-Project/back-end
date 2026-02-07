@@ -11,6 +11,7 @@ public record UserResource(
         String role,
         String companyName,
         UUID companyRoleId,
-        String language
+        String language,
+        String profileImageUrl
 ) {
 }

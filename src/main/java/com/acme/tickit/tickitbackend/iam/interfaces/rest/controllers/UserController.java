@@ -1,6 +1,8 @@
 package com.acme.tickit.tickitbackend.iam.interfaces.rest.controllers;
 
+import com.acme.tickit.tickitbackend.iam.application.internal.commandservices.UploadUserProfileImageCommandService;
 import com.acme.tickit.tickitbackend.iam.domain.model.commands.DeleteUserByIdCommand;
+import com.acme.tickit.tickitbackend.iam.domain.model.commands.UploadUserProfileImageCommand;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersByRoleQuery;
@@ -13,8 +15,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +32,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class UserController {
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
+    private final UploadUserProfileImageCommandService uploadUserProfileImageCommandService;
 
-    public UserController(UserCommandService userCommandService, UserQueryService userQueryService) {
+    public UserController(UserCommandService userCommandService, UserQueryService userQueryService,
+                          UploadUserProfileImageCommandService uploadUserProfileImageCommandService) {
         this.userCommandService = userCommandService;
         this.userQueryService = userQueryService;
+        this.uploadUserProfileImageCommandService = uploadUserProfileImageCommandService;
     }
 
     @GetMapping("/{companyId}/users")
@@ -76,6 +83,29 @@ public class UserController {
                 .map(UserResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
         return ResponseEntity.ok(userResources);
+    }
+
+    @PatchMapping(value = "/{userId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Update user profile image", description = "Updates the profile image of a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile image updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid image"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserResource> updateProfileImage(
+            @PathVariable UUID userId,
+            @RequestPart("image") MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            uploadUserProfileImageCommandService.handle(new UploadUserProfileImageCommand(userId, image.getBytes()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+        var user = userQueryService.handle(new GetUserByIdQuery(userId));
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(UserResourceFromEntityAssembler.toResourceFromEntity(user.get()));
     }
 
     @PatchMapping("/{companyId}/password")
