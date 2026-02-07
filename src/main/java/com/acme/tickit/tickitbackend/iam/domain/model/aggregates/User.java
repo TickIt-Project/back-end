@@ -41,6 +41,9 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @Enumerated(EnumType.STRING)
     private Language language;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     public User() {}
 
     public User(String username, String email, String password, Boolean notify_active, 
@@ -66,9 +69,15 @@ public class User extends AuditableAbstractAggregateRoot<User> {
                 ? new CompanyRoleId(command.companyRoleId())
                 : null;
         this.language = Language.valueOf(command.language());
+        this.profileImageUrl = command.profileImageUrl();
     }
 
     public void updatePassword(String newPassword) {
         this.password = new Password(newPassword);
     }
+
+    public void updateProfileImage(String imageUrl) {
+        this.profileImageUrl = imageUrl;
+    }
+
 }
