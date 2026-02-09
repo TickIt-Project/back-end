@@ -48,23 +48,13 @@ public class IssueReportController {
         this.imageStorageService = imageStorageService;
     }
 
-    @PostMapping(value = "/issue-report", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Create a new Issue Report", description = "Create a new Issue Report. Use /issue-report/multipart for optional image.")
+    @PostMapping(value = "/issue-report", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Create a new Issue Report", description = "Create a new Issue Report. Accepts multipart/form-data with issueReport (JSON) and optional image.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Issue Report created"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "Issue Report not found")})
-    public ResponseEntity<IssueReportResource> createIssueReport(@RequestBody CreateIssueReportResource resource) {
-        return createIssueReportWithImage(resource, null);
-    }
-
-    @PostMapping(value = "/issue-report/multipart", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Create a new Issue Report with optional image", description = "Create a new Issue Report with optional image (multipart/form-data)")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Issue Report created"),
-            @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Issue Report not found")})
-    public ResponseEntity<IssueReportResource> createIssueReportMultipart(
+    public ResponseEntity<IssueReportResource> createIssueReport(
             @RequestPart("issueReport") CreateIssueReportResource resource,
             @RequestPart(value = "image", required = false) MultipartFile image) {
         String imgUrl = null;
@@ -75,19 +65,12 @@ public class IssueReportController {
                 return ResponseEntity.badRequest().build();
             }
         }
-        return createIssueReportWithImage(resource, imgUrl);
-    }
-
-    private ResponseEntity<IssueReportResource> createIssueReportWithImage(CreateIssueReportResource resource, String imgUrl) {
         var createCommand = CreateIssueReportCommandFromResourceAssembler.toCommandFromResource(resource, imgUrl);
         var issueReportId = issueReportCommandService.handle(createCommand);
         if (issueReportId == null) return ResponseEntity.badRequest().build();
-        var getIssueReportByIdQuery = new GetIssueReportByIdQuery(issueReportId);
-        var issueReportItem = issueReportQueryService.handle(getIssueReportByIdQuery);
-        if (issueReportItem.isEmpty()) return ResponseEntity.notFound().build();
-        var issueReportEntity = issueReportItem.get();
-        var issueReportResource = IssueReportResourceFromEntityAssembler.toResourceFromEntity(issueReportEntity);
-        return new ResponseEntity<>(issueReportResource, HttpStatus.CREATED);
+        var issueReport = issueReportQueryService.handle(new GetIssueReportByIdQuery(issueReportId));
+        if (issueReport.isEmpty()) return ResponseEntity.notFound().build();
+        return new ResponseEntity<>(IssueReportResourceFromEntityAssembler.toResourceFromEntity(issueReport.get()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{issueReportId}")

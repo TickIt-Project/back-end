@@ -17,7 +17,7 @@ public class IssueReportResourceFromEntityAssembler {
                         ? entity.getCompanyRole().getName()
                         : null,
                 entity.getSeverity().name(),
-                entity.getImgUrl() != null ? entity.getImgUrl() : "",
+                entity.getImageUrl(),
                 entity.getStatus().name(),
                 entity.getReporterId().userId(),
                 entity.getAssigneeId() != null

@@ -4,10 +4,6 @@ import com.acme.tickit.tickitbackend.iam.domain.model.commands.CreateUserCommand
 import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.CreateUserResource;
 
 public class CreateUserCommandFromResourceAssembler {
-    public static CreateUserCommand toCommandFromResource(CreateUserResource resource) {
-        return toCommandFromResource(resource, resource.profileImageUrl());
-    }
-
     public static CreateUserCommand toCommandFromResource(CreateUserResource resource, String profileImageUrlOverride) {
         return new CreateUserCommand(
                 resource.username(),
@@ -22,5 +18,3 @@ public class CreateUserCommandFromResourceAssembler {
         );
     }
 }
-
-// CHECK THIS LATER

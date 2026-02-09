@@ -94,8 +94,8 @@ public class IssueReportCreatedForCoincidenceEventHandler {
         }
 
         // 3. URLs are the same (imgUrl and issueScreenUrl)
-        if (urlsMatch(report1.getImgUrl(), report1.getIssueScreenUrl(),
-                report2.getImgUrl(), report2.getIssueScreenUrl())) {
+        if (urlsMatch(report1.getImageUrl(), report1.getIssueScreenUrl(),
+                report2.getImageUrl(), report2.getIssueScreenUrl())) {
             matchingConditions++;
         }
 

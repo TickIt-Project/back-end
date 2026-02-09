@@ -4,10 +4,6 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.Creat
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateIssueReportResource;
 
 public class CreateIssueReportCommandFromResourceAssembler {
-    public static CreateIssueReportCommand toCommandFromResource(CreateIssueReportResource resource) {
-        return toCommandFromResource(resource, resource.imgUrl());
-    }
-
     public static CreateIssueReportCommand toCommandFromResource(CreateIssueReportResource resource, String imgUrlOverride) {
         return new CreateIssueReportCommand(
                 resource.companyId(),
@@ -21,5 +17,3 @@ public class CreateIssueReportCommandFromResourceAssembler {
         );
     }
 }
-
-// CHECK THIS LATER
