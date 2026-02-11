@@ -9,6 +9,7 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.*;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateIssueReportCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportAssigneeCommand;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportImageCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportStatusCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportAssigneeChangedEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedForCoincidenceEvent;
@@ -134,4 +135,25 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
     private boolean hasUrl(String url) {
         return url != null && !url.isBlank();
     }
+
+    @Override
+    @Transactional
+    public Optional<IssueReport> handle(UpdateIssueReportImageCommand command) {
+        IssueReport issueReport = issueReportRepository.findById(command.issueReportId())
+                .orElseThrow(() ->
+                        new IssueReportNotFoundException(command.issueReportId().toString())
+                );
+
+        try {
+            issueReport.updateImageUrl(command.imageUrl());
+            issueReportRepository.save(issueReport);
+        } catch (Exception e) {
+            throw new IssueReportNotSavedException(e.getMessage());
+        }
+
+        return Optional.of(issueReport);
+    }
 }
+
+// cambiar para q se pueda agregar desde la creacion, no solo un update tanto para
+// user como para issue report -> tambien hacer update adicional a user

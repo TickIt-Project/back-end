@@ -44,7 +44,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     @Column(nullable = false)
     private Severity severity;
 
-    private String imgUrl;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -78,7 +79,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
         this.severity = Severity.valueOf(severity);
-        this.imgUrl = imgUrl;
+        this.imageUrl = imageUrl;
         this.status = Status.OPEN;
         this.reporterId = new UserID(reporterId);
         this.assigneeId = null;
@@ -96,7 +97,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
         this.severity = Severity.valueOf(command.severity());
-        this.imgUrl = command.imgUrl();
+        this.imageUrl = command.imgUrl();
         this.status = Status.OPEN;
         this.reporterId = new UserID(command.reporterId());
         this.assigneeId = null;
@@ -121,5 +122,9 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     public void updateAssigneeId(UUID assigneeId) {
         this.assigneeId = new UserID(assigneeId);
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

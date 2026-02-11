@@ -3,6 +3,7 @@ package com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.confi
 import com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
 import com.acme.tickit.tickitbackend.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.tokens.jwt.BearerTokenService;
+import com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.filters.SignInJsonBodyFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -119,6 +121,7 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/api/v1/issue-reports/**").authenticated()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(new SignInJsonBodyFilter(), SecurityContextHolderFilter.class);
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
