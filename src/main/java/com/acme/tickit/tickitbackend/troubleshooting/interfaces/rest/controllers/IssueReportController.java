@@ -16,7 +16,12 @@ import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.C
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateIssueReportAssigneeCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateIssueReportStatusCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.shared.application.external.ImageStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -24,9 +29,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,31 +49,28 @@ public class IssueReportController {
     private final IssueReportCommandService issueReportCommandService;
     private final IssueReportQueryService issueReportQueryService;
     private final ImageStorageService imageStorageService;
+    private final ObjectMapper objectMapper;
 
     public IssueReportController(IssueReportCommandService issueReportCommandService, IssueReportQueryService issueReportQueryService,
-                                 ImageStorageService imageStorageService) {
+                                 ImageStorageService imageStorageService, ObjectMapper objectMapper) {
         this.issueReportCommandService = issueReportCommandService;
         this.issueReportQueryService = issueReportQueryService;
         this.imageStorageService = imageStorageService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping(value = "/issue-report", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Create a new Issue Report", description = "Create a new Issue Report. Accepts multipart/form-data with issueReport (JSON) and optional image.")
+    @Operation(summary = "Create a new Issue Report", description = "Multipart form: part 'issueReport' = JSON object (type or paste below). Part 'image' = image file only (optional).")
+    @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE, encoding = @Encoding(name = "issueReport", contentType = APPLICATION_JSON_VALUE)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Issue Report created"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "Issue Report not found")})
     public ResponseEntity<IssueReportResource> createIssueReport(
             @RequestPart("issueReport") CreateIssueReportResource resource,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         String imgUrl = null;
-        if (image != null && !image.isEmpty()) {
-            try {
-                imgUrl = imageStorageService.upload(image.getBytes(), "issue-reports");
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().build();
-            }
-        }
+        if (image != null && !image.isEmpty()) imgUrl = imageStorageService.upload(image.getBytes(), "issue-reports");
         var createCommand = CreateIssueReportCommandFromResourceAssembler.toCommandFromResource(resource, imgUrl);
         var issueReportId = issueReportCommandService.handle(createCommand);
         if (issueReportId == null) return ResponseEntity.badRequest().build();
@@ -100,13 +106,19 @@ public class IssueReportController {
         return ResponseEntity.ok(issueReportResources);
     }
 
-    @PatchMapping("/{issueReportId}/status")
-    @Operation(summary = "Update issue report status", description = "Updates the status of a issue report")
+    @PatchMapping(value = "/{issueReportId}/status", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update issue report status", description = "Updates the status of a issue report. Body: { \"status\": \"OPEN\" | \"IN_PROGRESS\" | \"CLOSED\" }")
+    @RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdateIssueReportStatusResource.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Issue Report status updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "Issue Report not found")
     })
-    public ResponseEntity<IssueReportResource> updateIssueReportStatus(@PathVariable UUID issueReportId, @RequestBody UpdateIssueReportStatusResource resource) {
+    public ResponseEntity<IssueReportResource> updateIssueReportStatus(@PathVariable UUID issueReportId, HttpServletRequest request) throws IOException {
+        UpdateIssueReportStatusResource resource = objectMapper.readValue(
+                StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8),
+                UpdateIssueReportStatusResource.class);
+        if (resource == null) return ResponseEntity.badRequest().build();
         var command = UpdateIssueReportStatusCommandFromResourceAssembler.toCommandFromResource(issueReportId, resource);
         var updateIssueReport = issueReportCommandService.handle(command);
         if (updateIssueReport.isEmpty()) return ResponseEntity.badRequest().build();
@@ -115,13 +127,19 @@ public class IssueReportController {
         return ResponseEntity.ok(issueReportResource);
     }
 
-    @PatchMapping("/{issueReportId}/assignee")
-    @Operation(summary = "Update issue report assignee", description = "Updates the assignee of a issue report")
+    @PatchMapping(value = "/{issueReportId}/assignee", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update issue report assignee", description = "Updates the assignee of a issue report. Body: { \"assigneeId\": \"uuid\" }")
+    @RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = UpdateIssueReportAssigneeResource.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Issue Report assignee updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "Issue Report not found")
     })
-    public ResponseEntity<IssueReportResource> updateIssueReportAssignee(@PathVariable UUID issueReportId, @RequestBody UpdateIssueReportAssigneeResource resource) {
+    public ResponseEntity<IssueReportResource> updateIssueReportAssignee(@PathVariable UUID issueReportId, HttpServletRequest request) throws IOException {
+        UpdateIssueReportAssigneeResource resource = objectMapper.readValue(
+                StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8),
+                UpdateIssueReportAssigneeResource.class);
+        if (resource == null) return ResponseEntity.badRequest().build();
         var command = UpdateIssueReportAssigneeCommandFromResourceAssembler.toCommandFromResource(issueReportId, resource);
         var updateIssueReport = issueReportCommandService.handle(command);
         if (updateIssueReport.isEmpty()) return ResponseEntity.badRequest().build();

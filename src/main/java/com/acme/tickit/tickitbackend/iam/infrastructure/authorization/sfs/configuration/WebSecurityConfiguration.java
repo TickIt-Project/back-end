@@ -3,7 +3,7 @@ package com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.confi
 import com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
 import com.acme.tickit.tickitbackend.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.tokens.jwt.BearerTokenService;
-import com.acme.tickit.tickitbackend.iam.interfaces.rest.filters.SignInJsonBodyFilter;
+import com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.filters.SignInJsonBodyFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

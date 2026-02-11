@@ -61,15 +61,9 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "404", description = "User not found")})
     public ResponseEntity<UserResource> createUser(
             @RequestPart("user") CreateUserResource resource,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
         String profileImageUrl = null;
-        if (profileImage != null && !profileImage.isEmpty()) {
-            try {
-                profileImageUrl = imageStorageService.upload(profileImage.getBytes(), "users/profile");
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().build();
-            }
-        }
+        if (profileImage != null && !profileImage.isEmpty()) profileImageUrl = imageStorageService.upload(profileImage.getBytes(), "users/profile");
         var createCommand = CreateUserCommandFromResourceAssembler.toCommandFromResource(resource, profileImageUrl);
         var userId = userCommandService.handle(createCommand);
         if (userId == null) return ResponseEntity.badRequest().build();
@@ -88,25 +82,12 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200", description = "User signed in"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
             @ApiResponse(responseCode = "404", description = "User not found")})
-    public ResponseEntity<AuthenticatedUserResource> signIn(HttpServletRequest request) {
-        String body;
-        try {
-            body = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (body == null || body.isBlank()) {
-            return ResponseEntity.badRequest().build();
-        }
-        SignInResource resource;
-        try {
-            resource = objectMapper.readValue(body, SignInResource.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<AuthenticatedUserResource> signIn(HttpServletRequest request) throws IOException {
+        String body = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+        SignInResource resource = objectMapper.readValue(body, SignInResource.class);
         var signInCommand = SignInCommandFromResourceAssembler.toCommandFromResource(resource);
         var authentication = userCommandService.handle(signInCommand);
-        if (authentication == null) return ResponseEntity.badRequest().build();
+        if (authentication.isEmpty()) return ResponseEntity.badRequest().build();
         var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler.toResourceFromEntity(authentication.get().getLeft(), authentication.get().getRight());
         return ResponseEntity.ok(authenticatedUserResource);
     }

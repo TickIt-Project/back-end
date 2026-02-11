@@ -97,7 +97,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
         this.severity = Severity.valueOf(command.severity());
-        this.imageUrl = imageUrl;
+        this.imageUrl = command.imgUrl();
         this.status = Status.OPEN;
         this.reporterId = new UserID(command.reporterId());
         this.assigneeId = null;

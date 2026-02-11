@@ -1,4 +1,4 @@
-package com.acme.tickit.tickitbackend.iam.interfaces.rest.filters;
+package com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
