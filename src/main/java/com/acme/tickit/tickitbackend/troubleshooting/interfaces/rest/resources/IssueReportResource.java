@@ -19,6 +19,7 @@ public record IssueReportResource(
         LocalDateTime resolvedAt,
         Boolean ticketOption,
         String issueScreenUrl,
-        Boolean coincidenceAvailable
+        Boolean coincidenceAvailable,
+        String language
 ) {
 }
