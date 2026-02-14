@@ -58,11 +58,14 @@ public class IssueReportCreatedForCoincidenceEventHandler {
             return;
         }
 
-        Language language = externalUserService.getLanguageByUserId(newReport.getReporterId().userId())
-                .orElse(Language.EN);
+        // Same company and same language (EN or ES) for comparison
+        Language language = newReport.getLanguage() != null
+                ? newReport.getLanguage()
+                : externalUserService.getLanguageByUserId(newReport.getReporterId().userId()).orElse(Language.EN);
 
-        var otherReports = issueReportRepository.findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndIdNot(
+        var otherReports = issueReportRepository.findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndLanguageAndIdNot(
                 newReport.getCompanyId().companyId(),
+                language,
                 newReport.getId()
         );
 
@@ -130,7 +133,8 @@ public class IssueReportCreatedForCoincidenceEventHandler {
         var coincidence = new IssueCoincidence(
                 report1.getCompanyId().companyId(),
                 title,
-                description
+                description,
+                language
         );
 
         Arrays.stream(commonWords)

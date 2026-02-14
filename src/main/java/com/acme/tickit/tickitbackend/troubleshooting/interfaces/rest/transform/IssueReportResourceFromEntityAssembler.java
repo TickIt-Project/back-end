@@ -27,7 +27,8 @@ public class IssueReportResourceFromEntityAssembler {
                 entity.getResolvedAt(),
                 entity.getTicketOption(),
                 entity.getIssueScreenUrl() != null ? entity.getIssueScreenUrl() : "",
-                entity.getCoincidenceAvailable()
+                entity.getCoincidenceAvailable(),
+                entity.getLanguage().name()
         );
     }
 }

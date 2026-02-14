@@ -1,6 +1,7 @@
 package com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories;
 
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Severity;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Status;
@@ -40,6 +41,15 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, UUID> 
 
     List<IssueReport> findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndIdNot(
             UUID companyId,
+            UUID excludeId
+    );
+
+    /**
+     * Issue reports eligible for coincidence: same company, same language (EN/ES), coincidence available, excluding the given id.
+     */
+    List<IssueReport> findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndLanguageAndIdNot(
+            UUID companyId,
+            Language language,
             UUID excludeId
     );
 
