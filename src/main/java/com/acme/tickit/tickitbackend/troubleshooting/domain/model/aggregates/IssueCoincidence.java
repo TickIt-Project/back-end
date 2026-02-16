@@ -2,6 +2,7 @@ package com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates;
 
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.ScreenLocation;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Keyword;
 import jakarta.persistence.*;
@@ -39,6 +40,8 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
     private Boolean jiraSynced;
     private LocalDateTime jiraSyncedAt;
 
+    private Language language;
+
     @ElementCollection
     @CollectionTable(
             name = "issue_coincidence_keywords",
@@ -51,12 +54,13 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
 
     public IssueCoincidence() {}
 
-    public IssueCoincidence(UUID companyID, String title, String description) {
+    public IssueCoincidence(UUID companyID, String title, String description, Language language) {
         this.companyID = new CompanyID(companyID);
         this.title = title;
         this.description = description;
         this.jiraSynced = false;
         this.jiraSyncedAt = null;
+        this.language = language;
     }
 
     // --- issueReports (ManyToMany) ---
