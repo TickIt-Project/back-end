@@ -64,7 +64,8 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
                 ? screenLocationRepository.findById(command.screenLocationId()).orElse(null)
                 : null;
         boolean coincidenceAvailable = calculateCoincidenceAvailable(command);
-        var issueReport = new IssueReport(command, screenLocation, companyRole, coincidenceAvailable);
+        var language = externalUserService.getLanguageByUserId(command.reporterId()).orElse(null);
+        var issueReport = new IssueReport(command, screenLocation, companyRole, coincidenceAvailable, language);
         try {
             issueReportRepository.save(issueReport);
             if (coincidenceAvailable) {

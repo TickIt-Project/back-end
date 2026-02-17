@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-@Service
+@Service("managementExternalUserService")
 public class ExternalUserService {
 
     private final UserContextFacade userContextFacade;
