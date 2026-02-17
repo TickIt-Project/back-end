@@ -4,6 +4,7 @@ import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetAllUsersQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersByRoleQuery;
+import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersWithRolesInQuery;
 import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserQueryService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.persistence.jpa.repositories.UserRepository;
@@ -36,5 +37,10 @@ public class UserQueryServiceImpl implements UserQueryService {
                 query.tenantId(),
                 Roles.valueOf(query.role())
         );
+    }
+
+    @Override
+    public List<User> handle(GetUsersWithRolesInQuery query) {
+        return userRepository.findAllByRole_NameIn(query.roles());
     }
 }

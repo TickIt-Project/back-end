@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -19,6 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByCompany_Id(UUID companyId);
     Optional<User> findByPersonalData_Name(String username);
     List<User> findAllByCompany_IdAndRole_Name(UUID companyId, Roles roleName);
+    List<User> findAllByRole_NameIn(Set<Roles> roles);
     Optional<User> findByCompany_IdAndPersonalData_Name(UUID companyId, String name);
     Optional<User> findByPersonalData_Email(String email);
     Optional<User> findByCompany_IdAndId(UUID companyId, UUID id);
