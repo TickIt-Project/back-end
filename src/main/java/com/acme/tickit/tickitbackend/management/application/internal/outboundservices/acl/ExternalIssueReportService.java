@@ -1,6 +1,5 @@
 package com.acme.tickit.tickitbackend.management.application.internal.outboundservices.acl;
 
-import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.acl.IssueReportContextFacade;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +16,9 @@ public class ExternalIssueReportService {
         this.issueReportContextFacade = issueReportContextFacade;
     }
 
-    public List<IssueReport> findAssignedToUserModifiedBetween(
+    public List<String> findStatusesAssignedToUserModifiedBetween(
             UUID companyId, UUID assigneeId, LocalDateTime updatedAtFrom, LocalDateTime updatedAtTo) {
-        return issueReportContextFacade.findAssignedToUserModifiedBetween(
+        return issueReportContextFacade.findStatusesAssignedToUserModifiedBetween(
                 companyId, assigneeId, updatedAtFrom, updatedAtTo);
     }
 }

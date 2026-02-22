@@ -6,7 +6,6 @@ import com.acme.tickit.tickitbackend.management.application.internal.outboundser
 import com.acme.tickit.tickitbackend.management.domain.model.aggregates.ItMemberStatistics;
 import com.acme.tickit.tickitbackend.management.domain.services.ItMemberStatisticsCommandService;
 import com.acme.tickit.tickitbackend.management.infrastructure.persistence.jpa.repositories.ItMemberStatisticsRepository;
-import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -93,24 +92,23 @@ public class ItMemberStatisticsCommandServiceImpl implements ItMemberStatisticsC
     }
 
     private Counts computeCounts(UUID companyId, UUID assigneeId, LocalDateTime updatedAtFrom, LocalDateTime updatedAtTo) {
-        List<IssueReport> reports = externalIssueReportService.findAssignedToUserModifiedBetween(
+        List<String> statuses = externalIssueReportService.findStatusesAssignedToUserModifiedBetween(
                 companyId, assigneeId, updatedAtFrom, updatedAtTo);
 
         int open = 0, inProgress = 0, onHold = 0, closed = 0, cancelled = 0;
-        for (IssueReport r : reports) {
-            switch (r.getStatus()) {
-                case OPEN -> open++;
-                case IN_PROGRESS -> inProgress++;
-                case ON_HOLD -> onHold++;
-                case CLOSED -> closed++;
-                case CANCELLED -> cancelled++;
+        for (String status : statuses) {
+            switch (status) {
+                case "OPEN" -> open++;
+                case "IN_PROGRESS" -> inProgress++;
+                case "ON_HOLD" -> onHold++;
+                case "CLOSED" -> closed++;
+                case "CANCELLED" -> cancelled++;
+                default -> { }
             }
         }
-        int assigned = reports.size();
+        int assigned = statuses.size();
         return new Counts(assigned, open, inProgress, onHold, closed, cancelled);
     }
-
-    // TODO: improve how this functions works to avoid using IssueReport directly
 
     /** Returns Sunday of the week containing the given date. (Sunday = start of week) */
     private static LocalDate getSundayOfWeek(LocalDate date) {
