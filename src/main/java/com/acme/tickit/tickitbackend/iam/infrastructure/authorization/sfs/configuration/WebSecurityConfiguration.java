@@ -119,6 +119,7 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/api/v1/company-roles/**").authenticated()
                         .requestMatchers("api/v1/screen-locations/**").authenticated()
                         .requestMatchers("/api/v1/issue-reports/**").authenticated()
+                        .requestMatchers("/api/v1/it-member-statistics/**").authenticated()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(new SignInJsonBodyFilter(), SecurityContextHolderFilter.class);

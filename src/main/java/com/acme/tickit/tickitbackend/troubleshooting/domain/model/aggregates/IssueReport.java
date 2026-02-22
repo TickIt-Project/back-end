@@ -96,7 +96,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     }
 
     public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
-                       CompanyRole companyRole, Boolean coincidenceAvailable, String language) {
+                       CompanyRole companyRole, Boolean coincidenceAvailable, Language language) {
         this.companyId = new CompanyID(command.companyId());
         this.title = command.title();
         this.description = command.description();
@@ -111,7 +111,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.ticketOption = false;
         this.issueScreenUrl = command.issueScreenUrl();
         this.coincidenceAvailable = coincidenceAvailable;
-        this.language = Language.valueOf(language);
+        this.language = language;
     }
 
     public void updateStatus(String newStatus) {
