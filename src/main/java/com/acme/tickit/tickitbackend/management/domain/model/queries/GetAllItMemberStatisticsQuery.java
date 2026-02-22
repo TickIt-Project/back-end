@@ -4,8 +4,8 @@ import com.acme.tickit.tickitbackend.shared.domain.exceptions.CompanyIdNotAccept
 
 import java.util.UUID;
 
-public record GetAllItMemberStatisticsByCompanyIdQuery(UUID companyId) {
-    public GetAllItMemberStatisticsByCompanyIdQuery {
+public record GetAllItMemberStatisticsQuery(UUID companyId) {
+    public GetAllItMemberStatisticsQuery {
         if (companyId == null) {
             throw new CompanyIdNotAcceptedException();
         }

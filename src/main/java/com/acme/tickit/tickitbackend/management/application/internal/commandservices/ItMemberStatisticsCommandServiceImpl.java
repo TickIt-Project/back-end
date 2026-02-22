@@ -4,6 +4,7 @@ import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.management.application.internal.outboundservices.acl.ExternalIssueReportService;
 import com.acme.tickit.tickitbackend.management.application.internal.outboundservices.acl.ExternalUserService;
 import com.acme.tickit.tickitbackend.management.domain.model.aggregates.ItMemberStatistics;
+import com.acme.tickit.tickitbackend.management.domain.model.commands.CreateOrUpdateItMemberStatisticsCommand;
 import com.acme.tickit.tickitbackend.management.domain.model.valueobjects.IssueReportCounts;
 import com.acme.tickit.tickitbackend.management.domain.services.ItMemberStatisticsCommandService;
 import com.acme.tickit.tickitbackend.management.infrastructure.persistence.jpa.repositories.ItMemberStatisticsRepository;
@@ -38,20 +39,19 @@ public class ItMemberStatisticsCommandServiceImpl implements ItMemberStatisticsC
 
     @Override
     @Transactional
-    public Optional<ItMemberStatistics> createOrUpdateForUser(UUID userId) {
-        User user = externalUserService.getUserById(userId).orElse(null);
-        if (user == null || !user.getRole().getName().requiresItMemberStatistics()) {
-            return Optional.empty();
+    public UUID handle(CreateOrUpdateItMemberStatisticsCommand command) {
+        UUID companyId = externalUserService.getCompanyIdForItMember(command.userId()).orElse(null);
+        if (companyId == null) {
+            return null;
         }
-        UUID companyId = user.getCompany().getId();
         LocalDate today = LocalDate.now();
         LocalDate weekStart = getSundayOfWeek(today);
         LocalDateTime updatedAtFrom = weekStart.atStartOfDay();
         LocalDateTime updatedAtTo = LocalDateTime.now();
 
-        var counts = computeCounts(companyId, userId, updatedAtFrom, updatedAtTo);
+        var counts = computeCounts(companyId, command.userId(), updatedAtFrom, updatedAtTo);
 
-        return Optional.of(saveOrUpdate(companyId, userId, weekStart, counts));
+        return saveOrUpdate(companyId, command.userId(), weekStart, counts).getId();
     }
 
     @Override
@@ -80,16 +80,16 @@ public class ItMemberStatisticsCommandServiceImpl implements ItMemberStatisticsC
         var existing = itMemberStatisticsRepository
                 .findByCompanyID_CompanyIdAndItMemberId_ItMemberIdAndWeekStartDate(companyId, userId, weekStart);
 
+        ItMemberStatistics stats;
         if (existing.isPresent()) {
-            var stats = existing.get();
+            stats = existing.get();
             stats.setCounts(counts.assigned(), counts.open(), counts.inProgress(), counts.onHold(), counts.closed(), counts.cancelled());
-            return itMemberStatisticsRepository.save(stats);
         } else {
-            var stats = new ItMemberStatistics(companyId, userId, weekStart,
+            stats = new ItMemberStatistics(companyId, userId, weekStart,
                     counts.assigned(), counts.open(), counts.inProgress(),
                     counts.onHold(), counts.closed(), counts.cancelled());
-            return itMemberStatisticsRepository.save(stats);
         }
+        return itMemberStatisticsRepository.save(stats);
     }
 
     private IssueReportCounts computeCounts(UUID companyId, UUID assigneeId, LocalDateTime updatedAtFrom, LocalDateTime updatedAtTo) {

@@ -1,10 +1,12 @@
 package com.acme.tickit.tickitbackend.management.interfaces.rest.controllers;
 
-import com.acme.tickit.tickitbackend.management.domain.model.queries.GetAllItMemberStatisticsByCompanyIdQuery;
+import com.acme.tickit.tickitbackend.management.domain.model.queries.GetAllItMemberStatisticsQuery;
+import com.acme.tickit.tickitbackend.management.domain.model.queries.GetItMemberStatisticsByIdQuery;
 import com.acme.tickit.tickitbackend.management.domain.services.ItMemberStatisticsCommandService;
 import com.acme.tickit.tickitbackend.management.domain.services.ItMemberStatisticsQueryService;
 import com.acme.tickit.tickitbackend.management.interfaces.rest.resources.CreateItMemberStatisticsResource;
 import com.acme.tickit.tickitbackend.management.interfaces.rest.resources.ItMemberStatisticsResource;
+import com.acme.tickit.tickitbackend.management.interfaces.rest.transform.CreateItMembersStatisticsCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.management.interfaces.rest.transform.ItMemberStatisticsResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,8 +42,8 @@ public class ItMemberStatisticsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully")
     })
-    public ResponseEntity<List<ItMemberStatisticsResource>> getAllByCompanyId(@PathVariable UUID companyId) {
-        var query = new GetAllItMemberStatisticsByCompanyIdQuery(companyId);
+    public ResponseEntity<List<ItMemberStatisticsResource>> getAllItMembersStatistics(@PathVariable UUID companyId) {
+        var query = new GetAllItMemberStatisticsQuery(companyId);
         var statistics = itMemberStatisticsQueryService.handle(query);
         var resources = statistics.stream()
                 .map(ItMemberStatisticsResourceFromEntityAssembler::toResourceFromEntity)
@@ -56,13 +58,14 @@ public class ItMemberStatisticsController {
             @ApiResponse(responseCode = "400", description = "Invalid user (not found or not IT head/member)")
     })
     public ResponseEntity<ItMemberStatisticsResource> createOrUpdate(@RequestBody CreateItMemberStatisticsResource resource) {
-        var stats = itMemberStatisticsCommandService.createOrUpdateForUser(resource.userId());
-        if (stats.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        var resourceResult = ItMemberStatisticsResourceFromEntityAssembler.toResourceFromEntity(stats.get());
-        return ResponseEntity.ok(resourceResult);
+        var createCommand = CreateItMembersStatisticsCommandFromResourceAssembler.toCommandFromResource(resource);
+        var statisticsId = itMemberStatisticsCommandService.handle(createCommand);
+        if (statisticsId == null) return ResponseEntity.notFound().build();
+        var getStatisticsByIdQuery = new GetItMemberStatisticsByIdQuery(statisticsId);
+        var statisticsItem = itMemberStatisticsQueryService.handle(getStatisticsByIdQuery);
+        if (statisticsItem.isEmpty()) return ResponseEntity.notFound().build();
+        var statisticsEntity = statisticsItem.get();
+        var statisticsResource = ItMemberStatisticsResourceFromEntityAssembler.toResourceFromEntity(statisticsEntity);
+        return new ResponseEntity<>(statisticsResource, HttpStatus.CREATED);
     }
-
-    // TODO: Improve the structure of this endpoint as a create
 }

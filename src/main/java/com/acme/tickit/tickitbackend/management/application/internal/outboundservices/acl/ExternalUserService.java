@@ -23,6 +23,14 @@ public class ExternalUserService {
         return userContextFacade.GetUserById(userId);
     }
 
+    /**
+     * Returns the company id for the user if they are an IT member (IT_HEAD or IT_MEMBER).
+     * Use this instead of loading the full User when only company id is needed.
+     */
+    public Optional<UUID> getCompanyIdForItMember(UUID userId) {
+        return userContextFacade.getCompanyIdForUserIfRequiresItMemberStatistics(userId);
+    }
+
     public List<User> getAllItMembers() {
         return userContextFacade.getAllUsersWithRolesIn(Set.of(Roles.IT_HEAD, Roles.IT_MEMBER));
     }

@@ -38,4 +38,11 @@ public class UserContextFacadeImpl implements UserContextFacade {
     public List<User> getAllUsersWithRolesIn(Set<Roles> roles) {
         return userQueryService.handle(new GetUsersWithRolesInQuery(roles));
     }
+
+    @Override
+    public Optional<UUID> getCompanyIdForUserIfRequiresItMemberStatistics(UUID userId) {
+        return userQueryService.handle(new GetUserByIdQuery(userId))
+                .filter(user -> user.getRole().getName().requiresItMemberStatistics())
+                .map(user -> user.getCompany().getId());
+    }
 }

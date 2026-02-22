@@ -1,6 +1,7 @@
 package com.acme.tickit.tickitbackend.management.domain.services;
 
 import com.acme.tickit.tickitbackend.management.domain.model.aggregates.ItMemberStatistics;
+import com.acme.tickit.tickitbackend.management.domain.model.commands.CreateOrUpdateItMemberStatisticsCommand;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -12,7 +13,7 @@ public interface ItMemberStatisticsCommandService {
      * Manual endpoint: considers issue reports modified from Sunday of current week to now.
      * If one exists for this week (created during the week), it will be updated.
      */
-    Optional<ItMemberStatistics> createOrUpdateForUser(UUID userId);
+    UUID handle(CreateOrUpdateItMemberStatisticsCommand command);
 
     /**
      * Runs for all IT heads and IT members at Saturday midnight.

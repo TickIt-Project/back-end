@@ -12,4 +12,5 @@ public interface UserContextFacade {
     Boolean ExistsUserById(UUID userId);
     Optional<User> GetUserById(UUID userId);
     List<User> getAllUsersWithRolesIn(Set<Roles> roles);
+    Optional<UUID> getCompanyIdForUserIfRequiresItMemberStatistics(UUID userId);
 }
