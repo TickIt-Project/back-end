@@ -4,6 +4,7 @@ import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.management.application.internal.outboundservices.acl.ExternalIssueReportService;
 import com.acme.tickit.tickitbackend.management.application.internal.outboundservices.acl.ExternalUserService;
 import com.acme.tickit.tickitbackend.management.domain.model.aggregates.ItMemberStatistics;
+import com.acme.tickit.tickitbackend.management.domain.model.valueobjects.IssueReportCounts;
 import com.acme.tickit.tickitbackend.management.domain.services.ItMemberStatisticsCommandService;
 import com.acme.tickit.tickitbackend.management.infrastructure.persistence.jpa.repositories.ItMemberStatisticsRepository;
 import org.slf4j.Logger;
@@ -75,23 +76,23 @@ public class ItMemberStatisticsCommandServiceImpl implements ItMemberStatisticsC
         }
     }
 
-    private ItMemberStatistics saveOrUpdate(UUID companyId, UUID userId, LocalDate weekStart, Counts counts) {
+    private ItMemberStatistics saveOrUpdate(UUID companyId, UUID userId, LocalDate weekStart, IssueReportCounts counts) {
         var existing = itMemberStatisticsRepository
                 .findByCompanyID_CompanyIdAndItMemberId_ItMemberIdAndWeekStartDate(companyId, userId, weekStart);
 
         if (existing.isPresent()) {
             var stats = existing.get();
-            stats.setCounts(counts.assigned, counts.open, counts.inProgress, counts.onHold, counts.closed, counts.cancelled);
+            stats.setCounts(counts.assigned(), counts.open(), counts.inProgress(), counts.onHold(), counts.closed(), counts.cancelled());
             return itMemberStatisticsRepository.save(stats);
         } else {
             var stats = new ItMemberStatistics(companyId, userId, weekStart,
-                    counts.assigned, counts.open, counts.inProgress,
-                    counts.onHold, counts.closed, counts.cancelled);
+                    counts.assigned(), counts.open(), counts.inProgress(),
+                    counts.onHold(), counts.closed(), counts.cancelled());
             return itMemberStatisticsRepository.save(stats);
         }
     }
 
-    private Counts computeCounts(UUID companyId, UUID assigneeId, LocalDateTime updatedAtFrom, LocalDateTime updatedAtTo) {
+    private IssueReportCounts computeCounts(UUID companyId, UUID assigneeId, LocalDateTime updatedAtFrom, LocalDateTime updatedAtTo) {
         List<String> statuses = externalIssueReportService.findStatusesAssignedToUserModifiedBetween(
                 companyId, assigneeId, updatedAtFrom, updatedAtTo);
 
@@ -107,7 +108,7 @@ public class ItMemberStatisticsCommandServiceImpl implements ItMemberStatisticsC
             }
         }
         int assigned = statuses.size();
-        return new Counts(assigned, open, inProgress, onHold, closed, cancelled);
+        return new IssueReportCounts(assigned, open, inProgress, onHold, closed, cancelled);
     }
 
     /** Returns Sunday of the week containing the given date. (Sunday = start of week) */
@@ -115,6 +116,4 @@ public class ItMemberStatisticsCommandServiceImpl implements ItMemberStatisticsC
         int daysBack = date.getDayOfWeek().getValue() % 7; // SUN=0, MON=1, ..., SAT=6
         return date.minusDays(daysBack);
     }
-
-    private record Counts(int assigned, int open, int inProgress, int onHold, int closed, int cancelled) {}
 }
