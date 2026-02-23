@@ -20,7 +20,8 @@ public class FormOption extends AuditableModel {
 
     public FormOption() {}
 
-    public FormOption(String optionName) {
+    public FormOption(String optionName, Field field) {
         this.optionName = optionName;
+        this.field = field;
     }
 }
