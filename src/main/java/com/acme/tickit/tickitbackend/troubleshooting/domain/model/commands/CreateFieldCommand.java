@@ -5,16 +5,20 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldIsMa
 import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldNameNotAcceptedException;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldTypeNotAcceptedException;
 
+import java.util.List;
 import java.util.UUID;
 
-public record CreateFieldCommand(UUID categoryId,
-                                 String fieldName,
-                                 String fieldType,
-                                 Boolean isMandatory,
-                                 Boolean othersAvailable,
-                                 Number infNumLimit, Number supNumLimit,
-                                 Number infWordsLimit, Number supWordsLimit,
-                                 Number infCharactersLimit, Number supCharactersLimit) {
+public record CreateFieldCommand(
+        UUID categoryId,
+        String fieldName,
+        String fieldType,
+        Boolean isMandatory,
+        Boolean othersAvailable,
+        Number infNumLimit, Number supNumLimit,
+        Number infWordsLimit, Number supWordsLimit,
+        Number infCharactersLimit, Number supCharactersLimit,
+        List<String> formOptions
+) {
     public CreateFieldCommand {
         if (categoryId == null) {
             throw new CategoryIdNotAcceptedException();

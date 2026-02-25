@@ -16,7 +16,8 @@ public class CreateFieldCommandFromResourceAssembler {
                 resource.infWordsLimit(),
                 resource.supWordsLimit(),
                 resource.infCharactersLimit(),
-                resource.supCharactersLimit()
+                resource.supCharactersLimit(),
+                resource.formOptions()
         );
     }
 }
