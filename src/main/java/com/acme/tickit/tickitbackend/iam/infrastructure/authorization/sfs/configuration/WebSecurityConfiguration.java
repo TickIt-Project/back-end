@@ -120,6 +120,9 @@ public class WebSecurityConfiguration {
                         .requestMatchers("api/v1/screen-locations/**").authenticated()
                         .requestMatchers("/api/v1/issue-reports/**").authenticated()
                         .requestMatchers("/api/v1/it-member-statistics/**").authenticated()
+                        .requestMatchers("/api/v1/form-options/**").authenticated()
+                        .requestMatchers("/api/v1/fields/**").authenticated()
+                        .requestMatchers("/api/v1/categories/**").authenticated()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(new SignInJsonBodyFilter(), SecurityContextHolderFilter.class);
