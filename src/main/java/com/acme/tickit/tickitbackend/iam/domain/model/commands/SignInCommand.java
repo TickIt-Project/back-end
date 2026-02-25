@@ -1,12 +1,12 @@
 package com.acme.tickit.tickitbackend.iam.domain.model.commands;
 
+import com.acme.tickit.tickitbackend.iam.domain.exceptions.EmailNotAcceptedException;
 import com.acme.tickit.tickitbackend.iam.domain.exceptions.PasswordNotAcceptedException;
-import com.acme.tickit.tickitbackend.iam.domain.exceptions.UserNameNotAcceptedException;
 
-public record SignInCommand(String username, String password) {
+public record SignInCommand(String email, String password) {
     public SignInCommand {
-        if (username == null || username.isEmpty()) {
-            throw new UserNameNotAcceptedException();
+        if (email == null || email.isEmpty()) {
+            throw new EmailNotAcceptedException();
         }
         if (password == null || password.isEmpty()) {
             throw new PasswordNotAcceptedException();

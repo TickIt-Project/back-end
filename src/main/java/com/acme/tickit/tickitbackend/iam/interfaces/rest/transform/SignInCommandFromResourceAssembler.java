@@ -6,7 +6,7 @@ import com.acme.tickit.tickitbackend.iam.interfaces.rest.resources.SignInResourc
 public class SignInCommandFromResourceAssembler {
     public static SignInCommand toCommandFromResource(SignInResource resource) {
         return new SignInCommand(
-                resource.username(),
+                resource.email(),
                 resource.password()
         );
     }
