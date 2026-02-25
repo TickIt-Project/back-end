@@ -3,6 +3,7 @@ package com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities;
 import com.acme.tickit.tickitbackend.shared.domain.model.entities.AuditableModel;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.Category;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateFieldCommand;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.CategoryField;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.FieldType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,6 +64,20 @@ public class Field extends AuditableModel {
         this.supWordsLimit = command.supWordsLimit() != null ? command.supWordsLimit() : null;
         this.infCharactersLimit = command.infCharactersLimit() != null ? command.infCharactersLimit() : null;
         this.supCharactersLimit = command.supCharactersLimit() != null ? command.supCharactersLimit() : null;
+    }
+
+    public Field(CategoryField def, Category category) {
+        this.category = category;
+        this.fieldName = def.fieldName();
+        this.fieldType = FieldType.valueOf(def.fieldType());
+        this.isMandatory = def.isMandatory();
+        this.othersAvailable = def.othersAvailable();
+        this.infNumLimit = def.infNumLimit();
+        this.supNumLimit = def.supNumLimit();
+        this.infWordsLimit = def.infWordsLimit();
+        this.supWordsLimit = def.supWordsLimit();
+        this.infCharactersLimit = def.infCharactersLimit();
+        this.supCharactersLimit = def.supCharactersLimit();
     }
 
     public void addFormOption(FormOption formOption) {
