@@ -4,6 +4,8 @@ import com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.pipeli
 import com.acme.tickit.tickitbackend.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.tokens.jwt.BearerTokenService;
 import com.acme.tickit.tickitbackend.iam.infrastructure.authorization.sfs.filters.SignInJsonBodyFilter;
+import com.acme.tickit.tickitbackend.shared.infrastructure.exceptions.ApiError;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -102,7 +104,21 @@ public class WebSecurityConfiguration {
             return cors;
         }));
         http.csrf(csrfConfigurer -> csrfConfigurer.disable())
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler))
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(unauthorizedRequestHandler)
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            var error = new ApiError(
+                                    403,
+                                    "Forbidden",
+                                    "You do not have permission to access this resource",
+                                    request.getRequestURI()
+                            );
+
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            response.getWriter().write(new ObjectMapper().writeValueAsString(error));
+                        })
+                )
                 .sessionManagement( customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(
@@ -112,12 +128,11 @@ public class WebSecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/webjars/**",
                                 "/api/v1/companies/**",
-                                "api/v1/authentication/**",
                                 "/api/v1/roles/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/users/**").authenticated()
                         .requestMatchers("/api/v1/company-roles/**").authenticated()
-                        .requestMatchers("api/v1/screen-locations/**").authenticated()
+                        .requestMatchers("/api/v1/screen-locations/**").authenticated()
                         .requestMatchers("/api/v1/issue-reports/**").authenticated()
                         .requestMatchers("/api/v1/it-member-statistics/**").authenticated()
                         .requestMatchers("/api/v1/form-options/**").authenticated()
