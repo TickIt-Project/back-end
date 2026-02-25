@@ -16,6 +16,7 @@ public class CategoryResourceFromEntityAssembler {
                         .map(field -> new FieldResource(
                                 field.getId(),
                                 field.getFieldName(),
+                                field.getDescription(),
                                 field.getFieldType().name(),
                                 field.getIsMandatory(),
                                 field.getOthersAvailable(),

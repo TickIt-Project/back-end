@@ -9,6 +9,7 @@ public class FieldResourceFromEntityAssembler {
         return new FieldResource(
                 entity.getId(),
                 entity.getFieldName(),
+                entity.getDescription(),
                 entity.getFieldType().name(),
                 entity.getIsMandatory(),
                 entity.getOthersAvailable(),

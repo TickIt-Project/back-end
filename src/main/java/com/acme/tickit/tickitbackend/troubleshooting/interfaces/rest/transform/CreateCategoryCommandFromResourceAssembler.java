@@ -24,6 +24,7 @@ public class CreateCategoryCommandFromResourceAssembler {
     private static CategoryField toFieldDefinition(FieldDefinitionResource r) {
         return new CategoryField(
                 r.fieldName(),
+                r.description(),
                 r.fieldType(),
                 r.isMandatory(),
                 r.othersAvailable(),

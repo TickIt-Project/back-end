@@ -11,15 +11,16 @@ import java.util.UUID;
 public record CreateFieldResource(
         UUID categoryId,
         String fieldName,
+        String description,
         String fieldType,
         Boolean isMandatory,
         Boolean othersAvailable,
-        Number infNumLimit,
-        Number supNumLimit,
-        Number infWordsLimit,
-        Number supWordsLimit,
-        Number infCharactersLimit,
-        Number supCharactersLimit,
+        Double infNumLimit,
+        Double supNumLimit,
+        Integer infWordsLimit,
+        Integer supWordsLimit,
+        Integer infCharactersLimit,
+        Integer supCharactersLimit,
         List<String> formOptions
 ) {
     public CreateFieldResource {

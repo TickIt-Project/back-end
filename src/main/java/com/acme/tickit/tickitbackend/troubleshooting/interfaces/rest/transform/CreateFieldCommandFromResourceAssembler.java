@@ -8,6 +8,7 @@ public class CreateFieldCommandFromResourceAssembler {
         return new CreateFieldCommand(
                 resource.categoryId(),
                 resource.fieldName(),
+                resource.description(),
                 resource.fieldType(),
                 resource.isMandatory(),
                 resource.othersAvailable(),

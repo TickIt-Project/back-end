@@ -9,15 +9,16 @@ import java.util.List;
 /** Field data for embedding in create-category request (no categoryId). */
 public record FieldDefinitionResource(
         String fieldName,
+        String description,
         String fieldType,
         Boolean isMandatory,
         Boolean othersAvailable,
-        Number infNumLimit,
-        Number supNumLimit,
-        Number infWordsLimit,
-        Number supWordsLimit,
-        Number infCharactersLimit,
-        Number supCharactersLimit,
+        Double infNumLimit,
+        Double supNumLimit,
+        Integer infWordsLimit,
+        Integer supWordsLimit,
+        Integer infCharactersLimit,
+        Integer supCharactersLimit,
         List<String> formOptions
 ) {
     public FieldDefinitionResource {

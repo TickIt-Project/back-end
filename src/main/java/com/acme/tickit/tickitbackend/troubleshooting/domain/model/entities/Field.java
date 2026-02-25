@@ -29,6 +29,7 @@ public class Field extends AuditableModel {
     private Category category;
 
     private String fieldName;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -38,14 +39,14 @@ public class Field extends AuditableModel {
 
     private Boolean othersAvailable;
 
-    private Number infNumLimit;
-    private Number supNumLimit;
+    private Double infNumLimit;
+    private Double supNumLimit;
 
-    private Number infWordsLimit;
-    private Number supWordsLimit;
+    private Integer infWordsLimit;
+    private Integer supWordsLimit;
 
-    private Number infCharactersLimit;
-    private Number supCharactersLimit;
+    private Integer infCharactersLimit;
+    private Integer supCharactersLimit;
 
     @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FormOption> formOptions = new ArrayList<>();
@@ -55,6 +56,7 @@ public class Field extends AuditableModel {
     public Field(CreateFieldCommand command, Category category) {
         this.category = category;
         this.fieldName = command.fieldName();
+        this.description = command.description();
         this.fieldType = FieldType.valueOf(command.fieldType());
         this.isMandatory = command.isMandatory();
         this.othersAvailable = command.othersAvailable();
@@ -69,6 +71,7 @@ public class Field extends AuditableModel {
     public Field(CategoryField def, Category category) {
         this.category = category;
         this.fieldName = def.fieldName();
+        this.description = def.description();
         this.fieldType = FieldType.valueOf(def.fieldType());
         this.isMandatory = def.isMandatory();
         this.othersAvailable = def.othersAvailable();

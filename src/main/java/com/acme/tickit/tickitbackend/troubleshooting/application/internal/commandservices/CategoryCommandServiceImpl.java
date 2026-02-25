@@ -1,6 +1,8 @@
 package com.acme.tickit.tickitbackend.troubleshooting.application.internal.commandservices;
 
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.CompanyIdNotFoundException;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.troubleshooting.application.internal.outboundservices.acl.ExternalCompanyService;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.CategoryAlreadyExistsExceptions;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.CategoryNotCreatedException;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.Category;
@@ -22,17 +24,22 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     private final CategoryRepository categoryRepository;
     private final FieldRepository fieldRepository;
     private final FormOptionRepository formOptionRepository;
+    private final ExternalCompanyService externalCompanyService;
 
     public CategoryCommandServiceImpl(CategoryRepository categoryRepository,
                                       FieldRepository fieldRepository,
-                                      FormOptionRepository formOptionRepository) {
+                                      FormOptionRepository formOptionRepository,
+                                      ExternalCompanyService externalCompanyService) {
         this.categoryRepository = categoryRepository;
         this.fieldRepository = fieldRepository;
         this.formOptionRepository = formOptionRepository;
+        this.externalCompanyService = externalCompanyService;
     }
 
     @Override
     public UUID handle(CreateCategoryCommand command) {
+        if (!externalCompanyService.ExistsCompanyById(command.companyId()))
+            throw new CompanyIdNotFoundException(command.companyId().toString());
         if (categoryRepository.existsByCompanyIdAndName(new CompanyID(command.companyId()), command.name()))
             throw new CategoryAlreadyExistsExceptions(command.name());
         var category = new Category(command);
