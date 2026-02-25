@@ -60,12 +60,12 @@ public class CategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Category found"),
             @ApiResponse(responseCode = "404", description = "Category not found")})
-    public ResponseEntity<CategorySelectResource> getCategoryById(@PathVariable UUID categoryId) {
+    public ResponseEntity<CategoryResource> getCategoryById(@PathVariable UUID categoryId) {
         var getCategoryByIdQuery = new GetCategoryByIdQuery(categoryId);
         var category = categoryQueryService.handle(getCategoryByIdQuery);
         if (category.isEmpty()) return ResponseEntity.notFound().build();
         var categoryEntity = category.get();
-        var categoryResource = CategorySelectResourceFromEntityAssembler.toResourceFromEntity(categoryEntity);
+        var categoryResource = CategoryResourceFromEntityAssembler.toResourceFromEntity(categoryEntity);
         return ResponseEntity.ok(categoryResource);
     }
 
@@ -73,11 +73,11 @@ public class CategoryController {
     @Operation(summary = "Get all Categories", description = "Get all available Categories in the system by companyId.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categories retrieved successfully.")})
-    public ResponseEntity<List<CategoryResource>> getAllCategories(@PathVariable UUID companyId) {
+    public ResponseEntity<List<CategorySelectResource>> getAllCategories(@PathVariable UUID companyId) {
         var getAllCategoryQuery = new GetAllCategoriesQuery(companyId);
         var categories = categoryQueryService.handle(getAllCategoryQuery);
         var categoryResources = categories.stream()
-                .map(CategoryResourceFromEntityAssembler::toResourceFromEntity)
+                .map(CategorySelectResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
         return ResponseEntity.ok(categoryResources);
     }
