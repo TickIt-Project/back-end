@@ -76,7 +76,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/sign-in", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Sign in as a user", description = "Sign in with username and password.")
+    @Operation(summary = "Sign in as a user", description = "Sign in with email and password.")
     @RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = SignInResource.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User signed in"),

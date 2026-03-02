@@ -1,7 +1,9 @@
 package com.acme.tickit.tickitbackend.shared.domain.exceptions;
 
-public class CompanyIdNotAcceptedException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class CompanyIdNotAcceptedException extends DomainException {
     public CompanyIdNotAcceptedException() {
-        super("This company ID is null and not accepted");
+        super("This company ID is null and not accepted", HttpStatus.NOT_ACCEPTABLE);
     }
 }

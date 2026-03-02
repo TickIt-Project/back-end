@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.iam.domain.exceptions;
 
-public class RoleNameNullException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class RoleNameNullException extends DomainException {
     public RoleNameNullException() {
-        super("Role name cannot be null");
+        super("Role name cannot be null", HttpStatus.BAD_REQUEST);
     }
 }

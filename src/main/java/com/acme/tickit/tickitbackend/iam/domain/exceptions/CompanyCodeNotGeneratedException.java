@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.iam.domain.exceptions;
 
-public class CompanyCodeNotGeneratedException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class CompanyCodeNotGeneratedException extends DomainException {
     public CompanyCodeNotGeneratedException() {
-        super("The company code could not be generated");
+        super("The company code could not be generated", HttpStatus.BAD_REQUEST);
     }
 }
