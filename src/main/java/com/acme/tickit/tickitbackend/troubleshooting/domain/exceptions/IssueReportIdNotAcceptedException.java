@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions;
 
-public class IssueReportIdNotAcceptedException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class IssueReportIdNotAcceptedException extends DomainException {
     public IssueReportIdNotAcceptedException() {
-        super("The issue report cannot be null");
+        super("The issue report cannot be null", HttpStatus.NOT_ACCEPTABLE);
     }
 }

@@ -17,7 +17,7 @@ public class IssueReportResourceFromEntityAssembler {
                         ? entity.getCompanyRole().getName()
                         : null,
                 entity.getSeverity().name(),
-                entity.getImgUrl() != null ? entity.getImgUrl() : "",
+                entity.getImageUrl(),
                 entity.getStatus().name(),
                 entity.getReporterId().userId(),
                 entity.getAssigneeId() != null
@@ -27,7 +27,8 @@ public class IssueReportResourceFromEntityAssembler {
                 entity.getResolvedAt(),
                 entity.getTicketOption(),
                 entity.getIssueScreenUrl() != null ? entity.getIssueScreenUrl() : "",
-                entity.getCoincidenceAvailable()
+                entity.getCoincidenceAvailable(),
+                entity.getLanguage().name()
         );
     }
 }

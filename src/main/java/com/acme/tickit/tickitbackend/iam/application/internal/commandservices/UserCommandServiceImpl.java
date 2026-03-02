@@ -55,8 +55,6 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     @Override
     public UUID handle(CreateUserCommand command) {
-        if (userRepository.existsByPersonalData_Name(command.username()))
-            throw new UserNameAlreadyExistsException(command.username());
         if (userRepository.existsByPersonalData_Email(command.email()))
             throw new EmailAlreadyExistsException(command.email());
         if (!companyRepository.existsByCode(new CompanyCode(command.companyCode())))
@@ -91,11 +89,11 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public Optional<ImmutablePair<User, String>> handle(SignInCommand query) {
-        User user = userRepository.findByPersonalData_Name(query.username())
-                .orElseThrow(() -> new UserNotFoundException(query.username()));
+        User user = userRepository.findByPersonalData_Email(query.email())
+                .orElseThrow(() -> new UserNotFoundException(query.email()));
         if (!hashingService.matches(query.password(), user.getPassword().password()))
             throw new InvalidPasswordException();
-        var token = tokenService.generateToken(user.getPersonalData().email());
+        var token = tokenService.generateToken(query.email());
         return Optional.of(ImmutablePair.of(user, token));
     }
 

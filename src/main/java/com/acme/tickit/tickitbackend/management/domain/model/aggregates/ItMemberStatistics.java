@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,41 +24,38 @@ public class ItMemberStatistics extends AuditableAbstractAggregateRoot<ItMemberS
     private ItMemberId itMemberId;
 
     private Integer issuesAssignedCount;
-    private Integer issuesResolvedCount;
+    private Integer issuesOpenCount;
+    private Integer issuesInProgressCount;
+    private Integer issuesOnHoldCount;
+    private Integer issuesClosedCount;
+    private Integer issuesCancelledCount;
 
-    private LocalDateTime lastUpdatedDate;
+    /** Sunday of the week this stats covers. Null for legacy records created before week-based logic. */
+    private LocalDate weekStartDate;
 
     public ItMemberStatistics() {}
 
-    public ItMemberStatistics(UUID companyID, UUID itMemberId) {
+    public ItMemberStatistics(UUID companyID, UUID itMemberId, LocalDate weekStartDate,
+                              int issuesAssignedCount, int issuesOpenCount, int issuesInProgressCount,
+                              int issuesOnHoldCount, int issuesClosedCount, int issuesCancelledCount) {
         this.companyID = new CompanyID(companyID);
         this.itMemberId = new ItMemberId(itMemberId);
-        this.issuesAssignedCount = 0;
-        this.issuesResolvedCount = 0;
-        this.lastUpdatedDate = LocalDateTime.now();
+        this.weekStartDate = weekStartDate;
+        this.issuesAssignedCount = issuesAssignedCount;
+        this.issuesOpenCount = issuesOpenCount;
+        this.issuesInProgressCount = issuesInProgressCount;
+        this.issuesOnHoldCount = issuesOnHoldCount;
+        this.issuesClosedCount = issuesClosedCount;
+        this.issuesCancelledCount = issuesCancelledCount;
     }
 
-    public void updateDate() {
-        this.lastUpdatedDate = LocalDateTime.now();
-    }
-
-    public void IncreaseIssuesAssignedCount() {
-        this.issuesAssignedCount++;
-        this.updateDate();
-    }
-
-    public void DecreaseIssuesAssignedCount() {
-        this.issuesAssignedCount--;
-        this.updateDate();
-    }
-
-    public void IncreaseIssuesResolvedCount() {
-        this.issuesResolvedCount++;
-        this.updateDate();
-    }
-
-    public void DecreaseIssuesResolvedCount() {
-        this.issuesResolvedCount--;
-        this.updateDate();
+    public void setCounts(int issuesAssignedCount, int issuesOpenCount, int issuesInProgressCount,
+                          int issuesOnHoldCount, int issuesClosedCount, int issuesCancelledCount) {
+        this.issuesAssignedCount = issuesAssignedCount;
+        this.issuesOpenCount = issuesOpenCount;
+        this.issuesInProgressCount = issuesInProgressCount;
+        this.issuesOnHoldCount = issuesOnHoldCount;
+        this.issuesClosedCount = issuesClosedCount;
+        this.issuesCancelledCount = issuesCancelledCount;
     }
 }

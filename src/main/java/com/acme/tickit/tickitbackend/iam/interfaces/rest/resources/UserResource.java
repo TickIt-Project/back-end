@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record UserResource(
         UUID id,
+        UUID companyId,
         String name,
         String email,
         String password,
@@ -11,6 +12,7 @@ public record UserResource(
         String role,
         String companyName,
         UUID companyRoleId,
-        String language
+        String language,
+        String profileImageUrl
 ) {
 }

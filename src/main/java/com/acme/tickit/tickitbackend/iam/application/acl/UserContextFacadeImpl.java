@@ -2,11 +2,15 @@ package com.acme.tickit.tickitbackend.iam.application.acl;
 
 import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUserByIdQuery;
+import com.acme.tickit.tickitbackend.iam.domain.model.queries.GetUsersWithRolesInQuery;
+import com.acme.tickit.tickitbackend.iam.domain.model.valueobjects.Roles;
 import com.acme.tickit.tickitbackend.iam.domain.services.UserQueryService;
 import com.acme.tickit.tickitbackend.iam.interfaces.acl.UserContextFacade;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -28,5 +32,17 @@ public class UserContextFacadeImpl implements UserContextFacade {
     public Optional<User> GetUserById(UUID userId) {
         var getUser = new GetUserByIdQuery(userId);
         return userQueryService.handle(getUser);
+    }
+
+    @Override
+    public List<User> getAllUsersWithRolesIn(Set<Roles> roles) {
+        return userQueryService.handle(new GetUsersWithRolesInQuery(roles));
+    }
+
+    @Override
+    public Optional<UUID> getCompanyIdForUserIfRequiresItMemberStatistics(UUID userId) {
+        return userQueryService.handle(new GetUserByIdQuery(userId))
+                .filter(user -> user.getRole().getName().requiresItMemberStatistics())
+                .map(user -> user.getCompany().getId());
     }
 }

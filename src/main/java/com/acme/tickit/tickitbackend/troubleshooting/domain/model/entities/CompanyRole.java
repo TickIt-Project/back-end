@@ -1,6 +1,5 @@
 package com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities;
 
-import com.acme.tickit.tickitbackend.iam.domain.model.aggregates.User;
 import com.acme.tickit.tickitbackend.shared.domain.model.entities.AuditableModel;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;

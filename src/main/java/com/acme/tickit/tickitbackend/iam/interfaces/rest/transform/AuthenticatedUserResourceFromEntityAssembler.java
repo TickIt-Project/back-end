@@ -9,6 +9,7 @@ public class AuthenticatedUserResourceFromEntityAssembler {
         return new AuthenticatedUserResource(
                 user.getCompany().getId(),
                 user.getId(),
+                user.getPersonalData().name(),
                 user.getPersonalData().email(),
                 token
         );

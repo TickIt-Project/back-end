@@ -1,8 +1,6 @@
 package com.acme.tickit.tickitbackend.management.application.internal.eventhandlers;
 
 import com.acme.tickit.tickitbackend.iam.domain.model.events.UserCreatedEvent;
-import com.acme.tickit.tickitbackend.management.domain.model.aggregates.ItMemberStatistics;
-import com.acme.tickit.tickitbackend.management.infrastructure.persistence.jpa.repositories.ItMemberStatisticsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,21 +14,13 @@ public class UserCreatedEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserCreatedEventHandler.class);
 
-    private final ItMemberStatisticsRepository itMemberStatisticsRepository;
-
-    public UserCreatedEventHandler(ItMemberStatisticsRepository itMemberStatisticsRepository) {
-        this.itMemberStatisticsRepository = itMemberStatisticsRepository;
+    public UserCreatedEventHandler() {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handle(UserCreatedEvent event) {
-        if (!event.role().requiresItMemberStatistics()) {
-            return;
-        }
-        var statistics = new ItMemberStatistics(event.companyId(), event.userId());
-        itMemberStatisticsRepository.save(statistics);
-        LOGGER.info("Created ItMemberStatistics for user {} in company {}",
-                event.userId(), event.companyId());
+        // ItMemberStatistics are now created by scheduled job (Saturday midnight) or manual endpoint.
+        // No longer created when user is created.
     }
 }

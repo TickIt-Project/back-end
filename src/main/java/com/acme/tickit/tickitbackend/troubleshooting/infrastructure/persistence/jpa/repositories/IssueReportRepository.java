@@ -1,6 +1,7 @@
 package com.acme.tickit.tickitbackend.troubleshooting.infrastructure.persistence.jpa.repositories;
 
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Severity;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Status;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +43,33 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, UUID> 
     List<IssueReport> findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndIdNot(
             UUID companyId,
             UUID excludeId
+    );
+
+    /**
+     * Issue reports eligible for coincidence: same company, same language (EN/ES), coincidence available, excluding the given id.
+     */
+    List<IssueReport> findByCoincidenceAvailableTrueAndCompanyId_CompanyIdAndLanguageAndIdNot(
+            UUID companyId,
+            Language language,
+            UUID excludeId
+    );
+
+    /**
+     * Issue reports assigned to the given user, in the given company, modified between start and end.
+     * Used for ItMemberStatistics: user must be assignee and updatedAt within the week.
+     */
+    @Query("""
+    SELECT i FROM IssueReport i
+    WHERE i.companyId.companyId = :companyId
+      AND i.assigneeId.userId = :assigneeId
+      AND i.updatedAt >= :updatedAtFrom
+      AND i.updatedAt <= :updatedAtTo
+""")
+    List<IssueReport> findByCompanyIdAndAssigneeIdAndUpdatedAtBetween(
+            UUID companyId,
+            UUID assigneeId,
+            LocalDateTime updatedAtFrom,
+            LocalDateTime updatedAtTo
     );
 
 }

@@ -5,6 +5,7 @@ import java.util.UUID;
 public record AuthenticatedUserResource(
         UUID companyId,
         UUID userId,
+        String username,
         String email,
         String token
 ) {}

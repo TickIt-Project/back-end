@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.iam.domain.exceptions;
 
-public class JiraEmailAlreadyExistsException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class JiraEmailAlreadyExistsException extends DomainException {
     public JiraEmailAlreadyExistsException(String message) {
-        super("Jira email " + message + "already exists");
+        super("Jira email " + message + "already exists", HttpStatus.CONFLICT);
     }
 }

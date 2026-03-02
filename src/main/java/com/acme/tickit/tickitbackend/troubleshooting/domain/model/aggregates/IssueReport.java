@@ -2,6 +2,7 @@ package com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates;
 
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.CompanyID;
+import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateIssueReportCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.CompanyRole;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.entities.ScreenLocation;
@@ -44,7 +45,8 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     @Column(nullable = false)
     private Severity severity;
 
-    private String imgUrl;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -62,6 +64,9 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     private Boolean ticketOption;
     private String issueScreenUrl;
 
+    @Enumerated(EnumType.STRING)
+    private Language language;
+
     @ManyToMany(mappedBy = "issueReports")
     private List<IssueCoincidence> issueCoincidences = new ArrayList<>();
 
@@ -71,14 +76,15 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     public IssueReport(UUID companyId, String title, String description,
                        ScreenLocation screenLocation, CompanyRole companyRole,
-                       String severity, String imgUrl, UUID reporterId, String issueScreenUrl) {
+                       String severity, String imgUrl, UUID reporterId,
+                       String issueScreenUrl, String language) {
         this.companyId = new CompanyID(companyId);
         this.title = title;
         this.description = description;
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
         this.severity = Severity.valueOf(severity);
-        this.imgUrl = imgUrl;
+        this.imageUrl = imgUrl;
         this.status = Status.OPEN;
         this.reporterId = new UserID(reporterId);
         this.assigneeId = null;
@@ -86,17 +92,18 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.ticketOption = false;
         this.issueScreenUrl = issueScreenUrl;
         this.coincidenceAvailable = false;
+        this.language = Language.valueOf(language);
     }
 
     public IssueReport(CreateIssueReportCommand command, ScreenLocation screenLocation,
-                       CompanyRole companyRole, Boolean coincidenceAvailable) {
+                       CompanyRole companyRole, Boolean coincidenceAvailable, Language language) {
         this.companyId = new CompanyID(command.companyId());
         this.title = command.title();
         this.description = command.description();
         this.screenLocation = screenLocation;
         this.companyRole = companyRole;
         this.severity = Severity.valueOf(command.severity());
-        this.imgUrl = command.imgUrl();
+        this.imageUrl = command.imgUrl();
         this.status = Status.OPEN;
         this.reporterId = new UserID(command.reporterId());
         this.assigneeId = null;
@@ -104,6 +111,7 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
         this.ticketOption = false;
         this.issueScreenUrl = command.issueScreenUrl();
         this.coincidenceAvailable = coincidenceAvailable;
+        this.language = language;
     }
 
     public void updateStatus(String newStatus) {
@@ -121,5 +129,9 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
 
     public void updateAssigneeId(UUID assigneeId) {
         this.assigneeId = new UserID(assigneeId);
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
