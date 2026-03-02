@@ -153,10 +153,16 @@ public class WebSecurityConfiguration {
      * @param hashingService The hashing service
      * @param authenticationEntryPoint The authentication entry point
      */
-    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint) {
+    public WebSecurityConfiguration(
+            @Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService,
+            BearerTokenService tokenService,
+            BCryptHashingService hashingService,
+            @Qualifier("restAuthenticationEntryPoint") AuthenticationEntryPoint authenticationEntryPoint
+    ) {
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
         this.hashingService = hashingService;
         this.unauthorizedRequestHandler = authenticationEntryPoint;
     }
+
 }

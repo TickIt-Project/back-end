@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.iam.domain.exceptions;
 
-public class InvalidPasswordException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class InvalidPasswordException extends DomainException {
     public InvalidPasswordException() {
-        super("This password is invalid");
+        super("This password is invalid", HttpStatus.BAD_REQUEST);
     }
 }

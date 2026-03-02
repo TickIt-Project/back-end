@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.iam.domain.exceptions;
 
-public class UserIdNullException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class UserIdNullException extends DomainException {
     public UserIdNullException() {
-        super("User id cannot be null");
+        super("User id cannot be null", HttpStatus.BAD_REQUEST);
     }
 }

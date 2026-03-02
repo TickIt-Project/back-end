@@ -1,7 +1,10 @@
 package com.acme.tickit.tickitbackend.iam.domain.exceptions;
 
-public class UserNotSavedException extends RuntimeException {
+import com.acme.tickit.tickitbackend.shared.domain.exceptions.DomainException;
+import org.springframework.http.HttpStatus;
+
+public class UserNotSavedException extends DomainException {
     public UserNotSavedException(String message) {
-        super("User could not be saved: " + message);
+        super("User could not be saved: " + message, HttpStatus.BAD_REQUEST);
     }
 }
