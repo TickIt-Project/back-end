@@ -14,6 +14,7 @@ public final class ConnectionWords {
 
     private static final String WORD_DELIMITER = "\\s+";
     private static final String PUNCTUATION_PATTERN = "^\\p{Punct}+|\\p{Punct}+$";
+    private static final String QUOTED_TEXT_PATTERN = "\"(?:\\\\.|[^\"\\\\])*\"";
 
     private ConnectionWords() {
         // Utility class - prevent instantiation
@@ -63,8 +64,9 @@ public final class ConnectionWords {
         if (language == null) {
             throw new IllegalArgumentException("Language cannot be null");
         }
+        String sanitizedSentence = sentence.replaceAll(QUOTED_TEXT_PATTERN, " ");
         Set<String> stopWords = getWords(language);
-        return Arrays.stream(sentence.split(WORD_DELIMITER))
+        return Arrays.stream(sanitizedSentence.split(WORD_DELIMITER))
                 .map(word -> word.replaceAll(PUNCTUATION_PATTERN, ""))
                 .filter(word -> !word.isBlank())
                 .filter(word -> !stopWords.contains(word.toLowerCase()))
