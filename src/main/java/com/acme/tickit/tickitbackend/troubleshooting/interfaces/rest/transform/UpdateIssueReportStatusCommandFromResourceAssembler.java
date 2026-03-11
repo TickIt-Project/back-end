@@ -9,7 +9,8 @@ public class UpdateIssueReportStatusCommandFromResourceAssembler {
     public static UpdateIssueReportStatusCommand toCommandFromResource(UUID issueReportId, UpdateIssueReportStatusResource resource) {
         return new UpdateIssueReportStatusCommand(
                 issueReportId,
-                resource.status()
+                resource.status(),
+                resource.comment()
         );
     }
 }

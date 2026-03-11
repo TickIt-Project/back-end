@@ -5,7 +5,7 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.IssueRepo
 
 import java.util.UUID;
 
-public record UpdateIssueReportStatusCommand(UUID issueReportId, String status) {
+public record UpdateIssueReportStatusCommand(UUID issueReportId, String status, String comment) {
     public UpdateIssueReportStatusCommand {
         if (issueReportId == null) {
             throw new IssueReportIdNotAcceptedException();
