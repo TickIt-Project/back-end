@@ -1,6 +1,5 @@
 package com.acme.tickit.tickitbackend.management.domain.model.aggregates;
 
-import com.acme.tickit.tickitbackend.management.domain.model.valueobjects.ItMemberId;
 import com.acme.tickit.tickitbackend.management.domain.model.valueobjects.StatisticTotals;
 import com.acme.tickit.tickitbackend.management.domain.model.valueobjects.StatisticsDurations;
 import com.acme.tickit.tickitbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
@@ -11,33 +10,26 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-public class ItMemberStatistics extends AuditableAbstractAggregateRoot<ItMemberStatistics> {
+public class IssueCoincidenceStatistics extends AuditableAbstractAggregateRoot<IssueCoincidenceStatistics> {
 
     @Embedded
     private CompanyID companyID;
 
     @Embedded
-    private ItMemberId itMemberId;
+    private StatisticTotals statisticTotals;
 
     @Embedded
-    private StatisticTotals IssuesStatisticTotals;
+    private StatisticsDurations statisticDurations;
 
-    @Embedded
-    private StatisticsDurations IssuesStatisticDurations;
-
-    @Embedded
-    private StatisticTotals CoincidencesStatisticTotals;
-
-    @Embedded
-    private StatisticsDurations CoincidencesStatisticDurations;
+    private Integer weekDetectedCoincidence;
+    private Integer weekTicketsCreated;
+    private Integer totalActiveTickets;
 
     private LocalDate weekStartDate;
 
-    public ItMemberStatistics() {}
+    public IssueCoincidenceStatistics() {}
 }
