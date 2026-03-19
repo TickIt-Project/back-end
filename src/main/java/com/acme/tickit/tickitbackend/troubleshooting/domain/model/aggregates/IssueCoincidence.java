@@ -29,6 +29,9 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
+    @Column(name = "status", length = 50, nullable = true)
+    private String status;
+
     @ManyToMany
     @JoinTable(
             name = "issue_coincidence_issue_reports",
@@ -58,6 +61,7 @@ public class IssueCoincidence extends AuditableAbstractAggregateRoot<IssueCoinci
         this.companyID = new CompanyID(companyID);
         this.title = title;
         this.description = description;
+        this.status = null;
         this.jiraSynced = false;
         this.jiraSyncedAt = null;
         this.language = language;
