@@ -1,20 +1,23 @@
 package com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform;
 
-import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.CreateCategoryCommand;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateCategoryCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.CategoryField;
-import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateCategoryResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.FieldDefinitionResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.UpdateCategoryResource;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class CreateCategoryCommandFromResourceAssembler {
-    public static CreateCategoryCommand toCommandFromResource(CreateCategoryResource resource) {
+public class UpdateCategoryCommandFromResourceAssembler {
+
+    public static UpdateCategoryCommand toCommandFromResource(UUID categoryId, UpdateCategoryResource resource) {
         List<CategoryField> fieldDefs = resource.fields() == null ? null : resource.fields().stream()
-                .map(CreateCategoryCommandFromResourceAssembler::toFieldDefinition)
+                .map(UpdateCategoryCommandFromResourceAssembler::toFieldDefinition)
                 .collect(Collectors.toList());
-        return new CreateCategoryCommand(
-                resource.companyId(),
+
+        return new UpdateCategoryCommand(
+                categoryId,
                 resource.name(),
                 resource.description(),
                 fieldDefs
@@ -39,3 +42,4 @@ public class CreateCategoryCommandFromResourceAssembler {
         );
     }
 }
+

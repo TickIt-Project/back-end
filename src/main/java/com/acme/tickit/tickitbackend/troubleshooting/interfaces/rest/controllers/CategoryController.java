@@ -7,9 +7,11 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.services.CategoryQue
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CategorySelectResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CreateCategoryResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.CategoryResource;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.resources.UpdateCategoryResource;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CategorySelectResourceFromEntityAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CreateCategoryCommandFromResourceAssembler;
 import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.CategoryResourceFromEntityAssembler;
+import com.acme.tickit.tickitbackend.troubleshooting.interfaces.rest.transform.UpdateCategoryCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,7 +34,8 @@ public class CategoryController {
     private final CategoryCommandService categoryCommandService;
     private final CategoryQueryService categoryQueryService;
 
-    public CategoryController(CategoryCommandService categoryCommandService, CategoryQueryService categoryQueryService) {
+    public CategoryController(CategoryCommandService categoryCommandService,
+                              CategoryQueryService categoryQueryService) {
         this.categoryCommandService = categoryCommandService;
         this.categoryQueryService = categoryQueryService;
     }
@@ -53,6 +56,27 @@ public class CategoryController {
         var categoryEntity = categoryItem.get();
         var categoryResource = CategoryResourceFromEntityAssembler.toResourceFromEntity(categoryEntity);
         return new ResponseEntity<>(categoryResource, HttpStatus.CREATED);
+    }
+
+    @PatchMapping(value = "/{categoryId}", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update category", description = "Updates a category. Body contains fields definitions.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Category updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Category not found")
+    })
+    public ResponseEntity<CategoryResource> updateCategory(@PathVariable UUID categoryId,
+                                                           @RequestBody UpdateCategoryResource resource) {
+        if (resource == null) return ResponseEntity.badRequest().build();
+
+        var command = UpdateCategoryCommandFromResourceAssembler.toCommandFromResource(categoryId, resource);
+        var updatedCategoryId = categoryCommandService.handle(command);
+        if (updatedCategoryId == null) return ResponseEntity.badRequest().build();
+        var categoryItem = categoryQueryService.handle(new GetCategoryByIdQuery(updatedCategoryId));
+        if (categoryItem.isEmpty()) return ResponseEntity.notFound().build();
+        var categoryEntity = categoryItem.get();
+        var categoryResource = CategoryResourceFromEntityAssembler.toResourceFromEntity(categoryEntity);
+        return ResponseEntity.ok(categoryResource);
     }
 
     @GetMapping("/{categoryId}")

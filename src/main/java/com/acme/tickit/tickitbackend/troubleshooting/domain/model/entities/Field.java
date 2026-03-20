@@ -90,4 +90,22 @@ public class Field extends AuditableModel {
     public void removeFormOption(FormOption formOption) {
         this.formOptions.remove(formOption);
     }
+
+    /**
+     * Applies editable properties coming from {@link CategoryField}.
+     * Form options are intentionally handled elsewhere (e.g. in the category command service).
+     */
+    public void applyCategoryField(CategoryField def) {
+        this.fieldName = def.fieldName();
+        this.description = def.description();
+        this.fieldType = FieldType.valueOf(def.fieldType());
+        this.isMandatory = def.isMandatory();
+        this.othersAvailable = def.othersAvailable();
+        this.infNumLimit = def.infNumLimit();
+        this.supNumLimit = def.supNumLimit();
+        this.infWordsLimit = def.infWordsLimit();
+        this.supWordsLimit = def.supWordsLimit();
+        this.infCharactersLimit = def.infCharactersLimit();
+        this.supCharactersLimit = def.supCharactersLimit();
+    }
 }

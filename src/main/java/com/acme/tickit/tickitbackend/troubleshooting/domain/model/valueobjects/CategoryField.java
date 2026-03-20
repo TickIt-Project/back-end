@@ -5,10 +5,13 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldName
 import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldTypeNotAcceptedException;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Field data for embedding in other commands (e.g. create category with fields).
  * Same shape as CreateFieldCommand but without categoryId.
+ *
+ * @param fieldId optional; {@code null} when creating a new field, non-null when updating an existing field.
  */
 public record CategoryField(
         String fieldName,
@@ -19,7 +22,8 @@ public record CategoryField(
         Double infNumLimit, Double supNumLimit,
         Integer infWordsLimit, Integer supWordsLimit,
         Integer infCharactersLimit, Integer supCharactersLimit,
-        List<String> formOptions
+        List<String> formOptions,
+        UUID fieldId
 ) {
     public CategoryField {
         if (fieldName == null || fieldName.isEmpty()) {
