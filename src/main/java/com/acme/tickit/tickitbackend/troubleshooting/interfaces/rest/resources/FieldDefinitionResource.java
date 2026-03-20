@@ -5,6 +5,8 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldName
 import com.acme.tickit.tickitbackend.troubleshooting.domain.exceptions.FieldTypeNotAcceptedException;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /** Field data for embedding in create-category request (no categoryId). */
 public record FieldDefinitionResource(
@@ -19,7 +21,8 @@ public record FieldDefinitionResource(
         Integer supWordsLimit,
         Integer infCharactersLimit,
         Integer supCharactersLimit,
-        List<String> formOptions
+        List<String> formOptions,
+        Optional<UUID> fieldId
 ) {
     public FieldDefinitionResource {
         if (fieldName == null || fieldName.isEmpty()) {
@@ -33,6 +36,9 @@ public record FieldDefinitionResource(
         }
         if (othersAvailable == null) {
             othersAvailable = false;
+        }
+        if (fieldId == null) {
+            fieldId = Optional.empty();
         }
     }
 }

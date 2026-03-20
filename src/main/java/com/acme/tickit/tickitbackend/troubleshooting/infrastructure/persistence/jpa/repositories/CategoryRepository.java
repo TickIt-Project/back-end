@@ -13,5 +13,9 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
     Optional<Category> findById(UUID id);
     Boolean existsByCompanyIdAndName(CompanyID companyId, String name);
+
+    /** True if another category (not {@code excludeId}) already uses this name in the company. */
+    Boolean existsByCompanyIdAndNameAndIdNot(CompanyID companyId, String name, UUID excludeId);
+
     List<Category> findAllByCompanyId(CompanyID companyId);
 }
