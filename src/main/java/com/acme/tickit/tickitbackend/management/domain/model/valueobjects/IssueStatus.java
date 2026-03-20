@@ -1,6 +1,6 @@
-package com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects;
+package com.acme.tickit.tickitbackend.management.domain.model.valueobjects;
 
-public enum Status {
+public enum IssueStatus {
     OPEN,
     TO_DO,
     IN_PROGRESS,

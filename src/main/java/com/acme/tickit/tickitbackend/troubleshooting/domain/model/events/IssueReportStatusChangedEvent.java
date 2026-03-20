@@ -10,6 +10,7 @@ public record IssueReportStatusChangedEvent(
         UUID companyId,
         String previousStatus,
         String newStatus,
-        UUID assigneeId
+        UUID assigneeId,
+        String comment
 ) {
 }

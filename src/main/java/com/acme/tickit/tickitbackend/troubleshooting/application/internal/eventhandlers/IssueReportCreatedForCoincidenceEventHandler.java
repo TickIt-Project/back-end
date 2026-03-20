@@ -4,6 +4,7 @@ import com.acme.tickit.tickitbackend.shared.domain.model.valueobjects.Language;
 import com.acme.tickit.tickitbackend.troubleshooting.application.internal.outboundservices.acl.ExternalUserService;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueCoincidence;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.aggregates.IssueReport;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueCoincidenceCreatedEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedForCoincidenceEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.connectionwords.ConnectionWords;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.Keyword;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -31,13 +33,16 @@ public class IssueReportCreatedForCoincidenceEventHandler {
     private final IssueReportRepository issueReportRepository;
     private final IssueCoincidenceRepository issueCoincidenceRepository;
     private final ExternalUserService externalUserService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public IssueReportCreatedForCoincidenceEventHandler(IssueReportRepository issueReportRepository,
                                                          IssueCoincidenceRepository issueCoincidenceRepository,
-                                                         ExternalUserService externalUserService) {
+                                                         ExternalUserService externalUserService,
+                                                         ApplicationEventPublisher eventPublisher) {
         this.issueReportRepository = issueReportRepository;
         this.issueCoincidenceRepository = issueCoincidenceRepository;
         this.externalUserService = externalUserService;
+        this.eventPublisher = eventPublisher;
     }
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
@@ -153,6 +158,7 @@ public class IssueReportCreatedForCoincidenceEventHandler {
         }
 
         issueCoincidenceRepository.save(coincidence);
+        eventPublisher.publishEvent(new IssueCoincidenceCreatedEvent(coincidence.getId()));
         LOGGER.info("Created IssueCoincidence {} linking reports {} and {}",
                 coincidence.getId(), report1.getId(), report2.getId());
     }

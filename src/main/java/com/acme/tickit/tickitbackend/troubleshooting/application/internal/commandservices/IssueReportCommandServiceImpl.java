@@ -12,6 +12,7 @@ import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.Updat
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportImageCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.commands.UpdateIssueReportStatusCommand;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportAssigneeChangedEvent;
+import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportCreatedForCoincidenceEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.events.IssueReportStatusChangedEvent;
 import com.acme.tickit.tickitbackend.troubleshooting.domain.model.valueobjects.connectionwords.ConnectionWords;
@@ -68,6 +69,7 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
         var issueReport = new IssueReport(command, screenLocation, companyRole, coincidenceAvailable, language);
         try {
             issueReportRepository.save(issueReport);
+            eventPublisher.publishEvent(new IssueReportCreatedEvent(issueReport.getId()));
             if (coincidenceAvailable) {
                 eventPublisher.publishEvent(new IssueReportCreatedForCoincidenceEvent(issueReport.getId()));
             }
@@ -91,7 +93,8 @@ public class IssueReportCommandServiceImpl implements IssueReportCommandService 
                     issueReport.getCompanyId().companyId(),
                     previousStatus,
                     command.status(),
-                    issueReport.getAssigneeId() != null ? issueReport.getAssigneeId().userId() : null
+                    issueReport.getAssigneeId() != null ? issueReport.getAssigneeId().userId() : null,
+                    command.comment()
             ));
         } catch (Exception e) {
             throw new IssueReportNotSavedException(e.getMessage());

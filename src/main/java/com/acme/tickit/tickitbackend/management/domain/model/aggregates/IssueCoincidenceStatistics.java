@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-public class IssueReportsStatistics extends AuditableAbstractAggregateRoot<IssueReportsStatistics> {
+public class IssueCoincidenceStatistics extends AuditableAbstractAggregateRoot<IssueCoincidenceStatistics> {
 
     @Embedded
     private CompanyID companyID;
@@ -25,11 +25,11 @@ public class IssueReportsStatistics extends AuditableAbstractAggregateRoot<Issue
     @Embedded
     private StatisticsDurations statisticDurations;
 
-    private Integer totalActiveIssues;
-    private Integer weekReportedIssues;
+    private Integer weekDetectedCoincidence;
+    private Integer weekTicketsCreated;
+    private Integer totalActiveTickets;
 
     private LocalDate weekStartDate;
 
-    public IssueReportsStatistics() {}
-
+    public IssueCoincidenceStatistics() {}
 }
