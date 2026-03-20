@@ -7,12 +7,10 @@ public record ItMemberStatisticsResource(
         UUID id,
         UUID companyId,
         UUID itMemberId,
-        Integer issuesAssignedCount,
-        Integer issuesOpenCount,
-        Integer issuesInProgressCount,
-        Integer issuesOnHoldCount,
-        Integer issuesClosedCount,
-        Integer issuesCancelledCount,
+        StatisticTotalsResource issuesStatisticTotals,
+        StatisticsDurationsResource issuesStatisticDurations,
+        StatisticTotalsResource coincidencesStatisticTotals,
+        StatisticsDurationsResource coincidencesStatisticDurations,
         LocalDate weekStartDate
 ) {
 }

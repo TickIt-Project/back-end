@@ -115,15 +115,9 @@ public class IssueReport extends AuditableAbstractAggregateRoot<IssueReport> {
     }
 
     public void updateStatus(String newStatus) {
-        if (newStatus.toUpperCase().equals(Status.OPEN.name()) ||
-            newStatus.toUpperCase().equals(Status.IN_PROGRESS.name()) ||
-            newStatus.toUpperCase().equals(Status.ON_HOLD.name()) ||
-            newStatus.toUpperCase().equals(Status.CLOSED.name()) ||
-            newStatus.toUpperCase().equals(Status.CANCELLED.name())) {
-            this.status = Status.valueOf(newStatus);
-            if (this.status == Status.CLOSED) {
-                this.resolvedAt = LocalDateTime.now();
-            }
+        this.status = Status.valueOf(newStatus.toUpperCase());
+        if (this.status == Status.CLOSED) {
+            this.resolvedAt = LocalDateTime.now();
         }
     }
 

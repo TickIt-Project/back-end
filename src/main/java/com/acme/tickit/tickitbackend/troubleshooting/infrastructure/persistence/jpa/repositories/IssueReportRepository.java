@@ -72,4 +72,7 @@ public interface IssueReportRepository extends JpaRepository<IssueReport, UUID> 
             LocalDateTime updatedAtTo
     );
 
+    @Query("SELECT DISTINCT i.companyId.companyId FROM IssueReport i")
+    List<UUID> findDistinctCompanyIds();
+
 }
